@@ -31,6 +31,22 @@ router.get('/:id/conversations', requireAuth, ownBot, async (req, res) => {
   res.json(rows);
 });
 
+// GET /bots/:id/conversations/:convId
+router.get('/:id/conversations/:convId', requireAuth, ownBot, async (req, res) => {
+  const { rows: convs } = await pool.query(
+    'SELECT id, session_id, started_at, resolved FROM conversations WHERE id=$1 AND bot_id=$2',
+    [req.params.convId, req.botId]
+  );
+  if (!convs[0]) return res.status(404).json({ error: 'Conversation not found' });
+
+  const { rows: messages } = await pool.query(
+    'SELECT role, content, created_at FROM messages WHERE conversation_id=$1 ORDER BY created_at ASC',
+    [convs[0].id]
+  );
+  
+  res.json({ conversation: convs[0], messages });
+});
+
 // GET /bots/:id/analytics
 router.get('/:id/analytics', requireAuth, ownBot, async (req, res) => {
   const [totalConvos, resolvedConvos, totalMessages, totalLeads, last7Days] = await Promise.all([
