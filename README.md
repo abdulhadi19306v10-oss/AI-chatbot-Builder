@@ -56,16 +56,25 @@ docker run --name chatbot-db -e POSTGRES_PASSWORD=devpass -p 5433:5432 -d pgvect
 ```
 
 ### 4. Run the Application
-From the root folder, simply run the startup script:
+From the root folder, run one of the startup scripts depending on how you want to test:
+
+**Localhost only (Default):**
 ```bash
 python run.py
 ```
-This script will:
-1. Automatically start your `chatbot-db` Docker container.
-2. Boot the FastAPI backend server on port `8000`.
-3. Launch the Next.js frontend on port `3000`.
+This script will start the db, Node.js backend on `8000`, and Next.js frontend on `3000`. Access at `http://localhost:3000`.
 
-Access the web interface at `http://localhost:3000`.
+**LAN Testing (Phone/Other devices):**
+```bash
+python run_lan.py
+```
+Auto-detects your LAN IP, updates the frontend `.env.local` automatically so Google Auth continues to work, and binds the server to your network.
+
+**Worldwide Testing (Ngrok):**
+```bash
+python run_ngrok.py
+```
+Starts the servers and opens two ngrok tunnels. You will need to manually copy the URLs into your `.env.local` as instructed in the console.
 
 ## 🌐 Embedding the Bot
 Once you have trained your bot by uploading documents via the Dashboard, you can embed it into any HTML website using the provided script tag. (Manage your bot in the dashboard to copy the specific widget script).

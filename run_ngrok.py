@@ -1,20 +1,20 @@
-# ponytail: local testing script
-import subprocess, os, sys, re
-
-# Auto-update .env.local back to localhost
-env_path = os.path.join("Build", "frontend", ".env.local")
-if os.path.exists(env_path):
-    with open(env_path, "r") as f: env = f.read()
-    env = re.sub(r'NEXTAUTH_URL=.*', 'NEXTAUTH_URL=http://localhost:3000', env)
-    env = re.sub(r'NEXT_PUBLIC_BACKEND_URL=.*\n?', '', env)
-    with open(env_path, "w") as f: f.write(env)
+# ponytail: run servers and spawn ngrok windows
+import subprocess, os, sys
 
 print("⚡ Starting Database...")
 subprocess.run("docker start chatbot-db", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-print("⚡ Starting Backend & Frontend on Localhost...")
+print("⚡ Starting Backend & Frontend...")
 bp = subprocess.Popen("npm run dev", cwd=r"Build\backend-node", shell=True)
 fp = subprocess.Popen("npm run dev", cwd=r"Build\frontend", shell=True)
+
+print("🚇 Starting ngrok tunnels in new windows...")
+subprocess.Popen('start cmd /k "ngrok http 3000"', shell=True)
+subprocess.Popen('start cmd /k "ngrok http 8000"', shell=True)
+
+print("\n⚠️ IMPORTANT: Copy the ngrok URLs from the new windows and update Build/frontend/.env.local:")
+print("NEXTAUTH_URL=https://<frontend-url>")
+print("NEXT_PUBLIC_BACKEND_URL=https://<backend-url>\n")
 
 try:
     bp.wait()
