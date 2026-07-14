@@ -1,6 +1,20 @@
 // routes/chat.js — public chat endpoint + lead capture
 // POST /chat/:bot_token/message — no auth, rate-limited at app level
 const router = require('express').Router();
+
+// GET /chat/:bot_token/config - public config for widget load
+router.get('/:bot_token/config', async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT name, avatar, color, welcome_msg FROM bots WHERE bot_token=$1 AND status=$2',
+      [req.params.bot_token, 'active']
+    );
+    if (!rows[0]) return res.status(404).json({ error: 'Bot not active or not found' });
+    res.json(rows[0]);
+  } catch (e) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 const pool = require('../db');
 const { geminiEmbedding, geminiChat } = require('../gemini');
 

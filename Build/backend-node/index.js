@@ -26,7 +26,7 @@ const chatLimiter = rateLimit({
 });
 
 // Serve widget static files (widget.js, iframe.html, demo.html)
-app.use('/widget', express.static(path.join(__dirname, '..', 'backend', 'widget')));
+app.use('/widget', express.static(path.join(__dirname, 'widget')));
 
 app.use('/auth', authRouter);
 app.use('/bots', botsRouter);

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Demo - Chatbot Builder</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background: #f1f5f9; margin: 0; padding: 40px; }
+    h1 { color: #0f172a; }
+    p { color: #475569; max-width: 600px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <h1>Welcome to your Demo Website</h1>
+  <p>This is a simulated landing page. In the bottom right corner, you should see your custom Chatbot Widget loaded securely.</p>
+  <p>Test out your configurations (theme color, avatar, welcome message) and verify that it matches your Bot Setup.</p>
+  <script>
+    const token = new URLSearchParams(window.location.search).get('bot_token');
+    if(token) {
+      const script = document.createElement('script');
+      script.src = '/widget/widget.js';
+      script.setAttribute('data-bot-token', token);
+      script.defer = true;
+      document.body.appendChild(script);
+    } else {
+      document.write('<p style="color:red">No bot_token provided in URL.</p>');
+    }
+  </script>
+</body>
+</html>
