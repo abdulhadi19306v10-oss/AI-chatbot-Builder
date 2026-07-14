@@ -1,6 +1,7 @@
 "use client";
 
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 import Dashboard from "@/components/Dashboard";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -28,7 +29,10 @@ export default function Home() {
               </div>
             )}
             {isLoaded && !userId && (
-              <button onClick={() => signIn('google')} className="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-sm">Sign In with Google</button>
+              <div className="flex items-center gap-3">
+                <Link href="/login" className="px-5 py-2.5 font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">Log In</Link>
+                <Link href="/register" className="px-5 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-sm">Sign Up</Link>
+              </div>
             )}
           </div>
         </header>
@@ -43,9 +47,16 @@ export default function Home() {
           <div className="text-center py-32 bg-white/40 dark:bg-slate-800/40 backdrop-blur-xl border border-white/40 dark:border-slate-700 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <h2 className="text-4xl font-extrabold mb-4 text-slate-800 dark:text-slate-100 tracking-tight">Welcome to Chatbot Builder</h2>
             <p className="text-lg text-slate-500 dark:text-slate-400 mb-10 max-w-lg mx-auto">Build, train, and deploy an intelligent AI assistant for your website in minutes. No coding required.</p>
-            <button onClick={() => signIn('google')} className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-2xl hover:scale-105 transition-transform shadow-xl shadow-blue-500/30 text-lg">Continue with Google</button>
-            <p className="mt-6 text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-              You will need to provide Google OAuth credentials in your .env file to use this auth method.
+            <div className="flex justify-center gap-4">
+              <Link href="/register" className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-2xl hover:scale-105 transition-transform shadow-xl shadow-blue-500/30 text-lg">
+                Get Started Free
+              </Link>
+              <Link href="/login" className="px-8 py-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold rounded-2xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-lg">
+                Log In
+              </Link>
+            </div>
+            <p className="mt-8 text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+              You can sign up with your email or use Google OAuth for quick access.
             </p>
           </div>
         )}

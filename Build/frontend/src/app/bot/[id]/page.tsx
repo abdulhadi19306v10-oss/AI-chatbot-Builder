@@ -6,7 +6,7 @@ import BotManager from "@/components/BotManager";
 
 export default async function BotPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.email) redirect("/");
+  if (!session?.user?.email) redirect("/login");
   const { id } = await params;
 
   return (
