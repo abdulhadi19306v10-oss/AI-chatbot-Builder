@@ -44,6 +44,11 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
+// GET /bots/:id
+router.get('/:id', requireAuth, ownBot, (req, res) => {
+  res.json(req.bot);
+});
+
 // PUT /bots/:id
 router.put('/:id', requireAuth, ownBot, async (req, res) => {
   const { name, avatar, color, welcome_msg, status } = req.body;

@@ -14,10 +14,35 @@ export default function BotManager({ botId }: { botId: string }) {
   const [widgetCode, setWidgetCode] = useState<string>('');
   const [botToken, setBotToken] = useState<string>('');
   
+  const [botName, setBotName] = useState('');
+  const [avatar, setAvatar] = useState('');
+  const [color, setColor] = useState('#6366f1');
+  const [welcomeMsg, setWelcomeMsg] = useState('Hi! How can I help you today?');
+  const [savingConfig, setSavingConfig] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch documents on load and poll every 3 seconds
+  // Fetch bot data and documents on load
   useEffect(() => {
+    async function loadBotData() {
+      const token = await getToken();
+      if (!token || token === "test") return;
+      try {
+        const res = await fetch(`${getBackendUrl()}/bots/${botId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setBotName(data.name || '');
+          setAvatar(data.avatar || '');
+          setColor(data.color || '#6366f1');
+          setWelcomeMsg(data.welcome_msg || 'Hi! How can I help you today?');
+        }
+      } catch(e) {}
+    }
+    loadBotData();
+
     async function loadSnippet() {
       const token = await getToken();
       if (!token || token === "test") return;
@@ -109,8 +134,106 @@ export default function BotManager({ botId }: { botId: string }) {
     }
   };
 
+  const handleSaveConfig = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingConfig(true);
+    setSaveSuccess(false);
+    try {
+      const token = await getToken();
+      const res = await fetch(`${getBackendUrl()}/bots/${botId}`, {
+        method: "PUT",
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: botName,
+          avatar: avatar,
+          color: color,
+          welcome_msg: welcomeMsg
+        })
+      });
+      if (res.ok) {
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 3000);
+      } else {
+        alert("Failed to save bot configuration.");
+      }
+    } catch(err) {
+      alert("Error saving configuration.");
+    } finally {
+      setSavingConfig(false);
+    }
+  };
+
   return (
     <div ref={containerRef} className="grid gap-8 mt-8">
+      {/* Configuration Section */}
+      <section className="manager-section p-8 border border-slate-200 rounded-2xl bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <h2 className="text-2xl font-bold text-slate-800 tracking-tight mb-6">Bot Configuration</h2>
+        <form onSubmit={handleSaveConfig} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Bot Name</label>
+              <input 
+                type="text" 
+                value={botName}
+                onChange={e => setBotName(e.target.value)}
+                required
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Avatar (Emoji)</label>
+              <input 
+                type="text" 
+                maxLength={2}
+                value={avatar}
+                onChange={e => setAvatar(e.target.value)}
+                placeholder="🤖"
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none text-xl"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Theme Color</label>
+              <div className="flex gap-4 items-center">
+                <input 
+                  type="color" 
+                  value={color}
+                  onChange={e => setColor(e.target.value)}
+                  className="h-12 w-12 rounded-lg cursor-pointer border-0 p-0"
+                />
+                <input 
+                  type="text" 
+                  value={color}
+                  onChange={e => setColor(e.target.value)}
+                  className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none uppercase"
+                />
+              </div>
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">Welcome Message</label>
+              <textarea 
+                value={welcomeMsg}
+                onChange={e => setWelcomeMsg(e.target.value)}
+                rows={3}
+                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <button 
+              type="submit" 
+              disabled={savingConfig}
+              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition shadow-lg shadow-blue-500/30 disabled:opacity-50"
+            >
+              {savingConfig ? "Saving..." : "Save Configuration"}
+            </button>
+            {saveSuccess && <span className="text-emerald-600 font-medium flex items-center gap-1"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg> Saved!</span>}
+          </div>
+        </form>
+      </section>
+
       {/* Knowledge Base Section */}
       <section className="manager-section p-8 border border-slate-200 rounded-2xl bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in slide-in-from-bottom-4 duration-700">
         <h2 className="text-2xl font-bold text-slate-800 tracking-tight mb-6">Knowledge Base</h2>
