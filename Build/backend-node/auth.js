@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./db');
 
-const SECRET = process.env.JWT_SECRET;
+const SECRET = process.env.NEXTAUTH_SECRET || 'fallback_secret_for_dev';
 const SALT_ROUNDS = 10;
 
 // POST /auth/signup
@@ -19,8 +19,8 @@ router.post('/signup', async (req, res) => {
       [name, email, hash]
     );
     const user = rows[0];
-    const token = jwt.sign({ sub: user.id, email: user.email }, SECRET, { expiresIn: '7d' });
-    res.json({ token, user });
+    // Token generation removed; NextAuth manages session.
+    res.json({ user });
   } catch (e) {
     if (e.code === '23505') return res.status(409).json({ error: 'Email already registered' });
     console.error(e);
@@ -41,38 +41,35 @@ router.post('/login', async (req, res) => {
     const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) return res.status(401).json({ error: 'Invalid credentials' });
 
-    const token = jwt.sign({ sub: user.id, email: user.email }, SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+    // Return user object directly; NextAuth will issue its own JWT.
+    res.json({ user: { id: user.id, name: user.name, email: user.email } });
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: 'Server error' });
   }
 });
 
-// Middleware: verifies JWT and attaches req.userId
+// Middleware: verifies NextAuth JWT and attaches req.userId
 async function requireAuth(req, res, next) {
   const header = req.headers.authorization || '';
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
   if (!token) return res.status(401).json({ error: 'Missing token' });
   try {
     const payload = jwt.verify(token, SECRET);
-    req.userId = payload.sub;
-    next();
-  } catch {
-    // ponytail: fallback to decoding Google id_token from NextAuth
-    const payload = jwt.decode(token);
-    if (payload && payload.email) {
-      let { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [payload.email]);
-      if (!rows[0]) {
-        const result = await pool.query(
-          "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, 'oauth') RETURNING id",
-          [payload.name || 'Unnamed', payload.email]
-        );
-        rows = result.rows;
-      }
-      req.userId = rows[0].id;
-      return next();
+    if (!payload.email) return res.status(401).json({ error: 'Invalid token payload' });
+    
+    // Look up or auto-create user by email to ensure we have the DB integer ID.
+    let { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [payload.email]);
+    if (!rows[0]) {
+      const result = await pool.query(
+        "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, 'oauth') RETURNING id",
+        [payload.name || 'Unnamed', payload.email]
+      );
+      rows = result.rows;
     }
+    req.userId = rows[0].id;
+    next();
+  } catch (e) {
     res.status(401).json({ error: 'Invalid or expired token' });
   }
 }
