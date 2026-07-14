@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./db');
 
-const SECRET = process.env.NEXTAUTH_SECRET || 'fallback_secret_for_dev';
+const SECRET = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'fallback_secret_for_dev';
 const SALT_ROUNDS = 10;
 
 // POST /auth/signup

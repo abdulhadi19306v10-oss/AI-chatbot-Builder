@@ -87,7 +87,7 @@ router.post('/:bot_token/message', async (req, res) => {
 
     // 4. Build context and call LLM
     const context = chunks.map(c => c.content).join('\n\n');
-    const systemPrompt = `You are a helpful assistant. Answer the user's question using ONLY the provided context below.\nIf the context does not contain the answer, reply with the exact string NO_MATCH and nothing else.\n\nCONTEXT:\n${context}`;
+    const systemPrompt = `You are a helpful assistant. Answer the user's question using ONLY the provided context below.\nIf the context does not contain the answer, reply with the exact string NO_MATCH and nothing else.\nIMPORTANT: Do not mention the context in your reply. Just give a direct answer in a natural, complete sentence.\n\nCONTEXT:\n${context}`;
 
     const reply = await geminiChat([
       { role: 'system', content: systemPrompt },
