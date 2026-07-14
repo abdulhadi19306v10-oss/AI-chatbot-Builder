@@ -168,8 +168,8 @@ export default function BotManager({ botId }: { botId: string }) {
   };
 
   return (
-    <div ref={containerRef} className="grid gap-8 mt-8">
-      <div className="flex justify-end gap-4">
+    <div ref={containerRef} className="flex flex-col gap-8 mt-8">
+      <div className="flex gap-4">
         <a 
           href={`/bot/${botId}/conversations`}
           className="px-6 py-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-sm flex items-center gap-2"
@@ -186,8 +186,8 @@ export default function BotManager({ botId }: { botId: string }) {
         </a>
       </div>
       {/* Configuration Section */}
-      <section className="manager-section p-8 border border-slate-200 rounded-2xl bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <h2 className="text-2xl font-bold text-slate-800 tracking-tight mb-6">Bot Configuration</h2>
+      <section className="manager-section p-8 border border-slate-200 dark:border-slate-700 rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight mb-6">Bot Configuration</h2>
         <form onSubmit={handleSaveConfig} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -252,8 +252,8 @@ export default function BotManager({ botId }: { botId: string }) {
       </section>
 
       {/* Knowledge Base Section */}
-      <section className="manager-section p-8 border border-slate-200 rounded-2xl bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <h2 className="text-2xl font-bold text-slate-800 tracking-tight mb-6">Knowledge Base</h2>
+      <section className="manager-section p-8 border border-slate-200 dark:border-slate-700 rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 tracking-tight mb-6">Knowledge Base</h2>
         
         {docs.length > 0 && (
           <div className="mb-6 space-y-3">
@@ -344,8 +344,8 @@ export default function BotManager({ botId }: { botId: string }) {
       </section>
 
       {/* Embed Code Section */}
-      <section className="manager-section p-8 border border-slate-200 rounded-2xl bg-white/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <h2 className="text-2xl font-semibold mb-2 text-slate-800">Deploy Widget</h2>
+      <section className="manager-section p-8 border border-slate-200 dark:border-slate-700 rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <h2 className="text-2xl font-semibold mb-2 text-slate-800 dark:text-slate-100">Deploy Widget</h2>
         <p className="text-slate-500 mb-6">Paste this code right before the closing <code className="bg-slate-100 px-1 py-0.5 rounded">&lt;/body&gt;</code> tag on your website.</p>
         
         <div className="relative">
