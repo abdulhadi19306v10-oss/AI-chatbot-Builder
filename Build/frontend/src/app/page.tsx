@@ -24,7 +24,13 @@ export default function Home() {
             <ThemeToggle />
             {isLoaded && userId && (
               <div className="flex items-center gap-3">
-                <img src={session?.user?.image || ""} alt="Avatar" className="w-10 h-10 rounded-full shadow-sm border border-slate-200 dark:border-slate-700" />
+                {session?.user?.image ? (
+                  <img src={session.user.image} alt="Avatar" className="w-10 h-10 rounded-full shadow-sm border border-slate-200 dark:border-slate-700" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-slate-300 dark:bg-slate-700 flex items-center justify-center font-bold text-slate-600 dark:text-slate-300 uppercase">
+                    {session?.user?.name?.[0] || session?.user?.email?.[0] || '?'}
+                  </div>
+                )}
                 <button onClick={() => signOut()} className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition font-medium">Log out</button>
               </div>
             )}
