@@ -7,7 +7,7 @@
 node_modules/
 .next/
 out/
-build/
+**/build/
 dist/
 npm-debug.log*
 yarn-debug.log*
@@ -20,7 +20,7 @@ __pycache__/
 *.so
 .Python
 env/
-build/
+**/build/
 develop-eggs/
 dist/
 downloads/
