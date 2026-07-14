@@ -13,6 +13,7 @@ export default function BotManager({ botId }: { botId: string }) {
   const [docs, setDocs] = useState<any[]>([]);
   const [widgetCode, setWidgetCode] = useState<string>('');
   const [botToken, setBotToken] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
   
   const [botName, setBotName] = useState('');
   const [avatar, setAvatar] = useState('');
@@ -274,21 +275,64 @@ export default function BotManager({ botId }: { botId: string }) {
           </div>
         )}
 
-        <form onSubmit={handleUpload} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <input 
-            type="file" 
-            accept=".pdf,.txt,.docx"
-            multiple
-            onChange={(e) => setFiles(Array.from(e.target.files || []))}
-            className="flex-1 block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition cursor-pointer"
-          />
-          <button 
-            type="submit" 
-            disabled={uploading || files.length === 0}
-            className="px-6 py-3 whitespace-nowrap bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition shadow-lg shadow-blue-500/30 disabled:opacity-50"
+        <form onSubmit={handleUpload} className="space-y-4">
+          <div 
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+              const droppedFiles = Array.from(e.dataTransfer.files);
+              const validExtensions = ['.pdf', '.docx', '.txt'];
+              const valid = droppedFiles.filter(f => {
+                const ext = f.name.toLowerCase().substring(f.name.lastIndexOf('.'));
+                return validExtensions.includes(ext);
+              });
+              if (valid.length !== droppedFiles.length) {
+                alert("Only PDF, DOCX, and TXT files are accepted. Invalid files were ignored.");
+              }
+              if (valid.length > 0) {
+                setFiles(valid);
+              }
+            }}
+            className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
+              isDragging ? 'border-blue-500 bg-blue-50/50' : 'border-slate-300 bg-slate-50 hover:bg-slate-100/50 hover:border-slate-400'
+            }`}
           >
-            {uploading ? "Uploading..." : `Upload & Train (${files.length})`}
-          </button>
+            <input 
+              type="file" 
+              accept=".pdf,.txt,.docx"
+              multiple
+              onChange={(e) => {
+                const selected = Array.from(e.target.files || []);
+                setFiles(selected);
+              }}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              title=""
+            />
+            <div className="pointer-events-none flex flex-col items-center gap-2">
+              <svg className="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+              <p className="text-slate-600 font-medium">
+                Drag and drop your files here, or click to browse
+              </p>
+              <p className="text-xs text-slate-400">
+                Supports PDF, DOCX, TXT
+              </p>
+            </div>
+          </div>
+          
+          {files.length > 0 && (
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 border border-slate-200 rounded-xl shadow-sm">
+              <span className="text-sm text-slate-600 font-medium">{files.length} file(s) selected</span>
+              <button 
+                type="submit" 
+                disabled={uploading}
+                className="w-full sm:w-auto px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition shadow-md shadow-blue-500/20 disabled:opacity-50"
+              >
+                {uploading ? "Uploading..." : "Upload & Train"}
+              </button>
+            </div>
+          )}
         </form>
       </section>
 
