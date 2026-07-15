@@ -117,6 +117,12 @@ router.delete('/:id/documents/:doc_id', requireAuth, ownBot, async (req, res) =>
   res.json({ status: 'deleted' });
 });
 
+// GET /bots/:id/leads - ponytail: standard simple fetch
+router.get('/:id/leads', requireAuth, ownBot, async (req, res) => {
+  const { rows } = await pool.query('SELECT name, email, created_at FROM leads WHERE bot_id=$1 ORDER BY created_at DESC', [req.bot.id]);
+  res.json(rows);
+});
+
 // GET /bots/:id/embed-snippet
 router.get('/:id/embed-snippet', requireAuth, ownBot, (req, res) => {
   const origin = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 8000}`;

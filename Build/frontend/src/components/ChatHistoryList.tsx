@@ -35,11 +35,11 @@ export default function ChatHistoryList({ botId }: { botId: string }) {
       setExpandedId(null);
       return;
     }
-    
+
     setExpandedId(convId);
     setThreadLoading(true);
     setThreadMessages([]);
-    
+
     const token = (session as any)?.id_token || "test";
     try {
       const res = await fetch(`${getBackendUrl()}/bots/${botId}/conversations/${convId}`, {
@@ -55,69 +55,113 @@ export default function ChatHistoryList({ botId }: { botId: string }) {
     }
   };
 
-  if (loading) return <div className="p-8 text-center animate-pulse text-slate-500">Loading conversations...</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-2 border-[#E5E4DE] border-t-[#1FA391] animate-spin" />
+          <p className="text-sm text-[#6d7a76]">Loading conversations…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-8">
+    <div className="space-y-6">
+      {/* Page heading */}
+      <div>
+        <h1
+          className="text-3xl font-bold text-[#14171F]"
+          style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
+        >
+          Chat History
+        </h1>
+        <p className="text-[#6d7a76] mt-1 text-[15px]">
+          Browse and review all visitor conversations.
+        </p>
+      </div>
+
       {conversations.length === 0 ? (
-        <div className="bg-white/70 backdrop-blur-xl p-8 rounded-2xl shadow-sm border border-slate-200 text-center text-slate-500">
-          No conversations found yet.
+        <div className="bg-white border border-[#E5E4DE] rounded-xl p-10 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#E4F5F0] flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-[#1FA391]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </div>
+          <p className="text-[#14171F] font-semibold mb-1">No conversations yet</p>
+          <p className="text-sm text-[#6d7a76]">Conversations will appear here once your bot receives messages.</p>
         </div>
       ) : (
-        conversations.map((conv: any) => (
-          <div key={conv.id} className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-slate-200 overflow-hidden transition-all">
-            <button 
-              onClick={() => loadThread(conv.id)}
-              className="w-full text-left px-6 py-5 flex items-center justify-between hover:bg-slate-50/50 transition-colors"
+        <div className="space-y-3">
+          {conversations.map((conv: any) => (
+            <div
+              key={conv.id}
+              className="bg-white border border-[#E5E4DE] rounded-xl overflow-hidden shadow-sm"
             >
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-3">
-                  <span className="font-semibold text-slate-800">Session: {conv.session_id.substring(0,8)}...</span>
-                  <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${
-                    conv.resolved 
-                      ? 'bg-emerald-100 text-emerald-700' 
-                      : 'bg-red-100 text-red-700'
-                  }`}>
-                    {conv.resolved ? 'Resolved' : 'Needs Follow-up'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-slate-500">
-                  <span>{new Date(conv.started_at).toLocaleString()}</span>
-                  <span>•</span>
-                  <span>{conv.message_count} messages</span>
-                </div>
-              </div>
-              <svg className={`w-5 h-5 text-slate-400 transition-transform ${expandedId === conv.id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-            </button>
-            
-            {expandedId === conv.id && (
-              <div className="px-6 py-6 bg-slate-50 border-t border-slate-200 max-h-[500px] overflow-y-auto">
-                {threadLoading ? (
-                  <div className="text-center py-4 text-slate-400 animate-pulse">Loading thread...</div>
-                ) : threadMessages.length === 0 ? (
-                  <div className="text-center py-4 text-slate-400">No messages in this thread.</div>
-                ) : (
-                  <div className="space-y-4">
-                    {threadMessages.map((msg: any, i: number) => (
-                      <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
-                        <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm ${
-                          msg.role === 'user' 
-                            ? 'bg-blue-600 text-white rounded-tr-sm' 
-                            : 'bg-white border border-slate-200 text-slate-800 rounded-tl-sm shadow-sm'
-                        }`}>
-                          {msg.content}
-                        </div>
-                        <span className="text-[10px] text-slate-400 mt-1 px-1">
-                          {new Date(msg.created_at).toLocaleTimeString()}
-                        </span>
-                      </div>
-                    ))}
+              <button
+                onClick={() => loadThread(conv.id)}
+                className="w-full text-left px-6 py-4 flex items-center justify-between hover:bg-[#FAFAF8] transition-colors"
+              >
+                <div className="flex flex-col gap-1.5">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="font-semibold text-[#14171F] text-sm">
+                      Session: {conv.session_id.substring(0, 8)}…
+                    </span>
+                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${
+                      conv.resolved
+                        ? 'bg-[#E4F5F0] text-[#1FA391]'
+                        : 'bg-red-50 text-[#D64545]'
+                    }`}>
+                      {conv.resolved ? 'Resolved' : 'Needs Follow-up'}
+                    </span>
                   </div>
-                )}
-              </div>
-            )}
-          </div>
-        ))
+                  <div className="flex items-center gap-3 text-xs text-[#6d7a76]">
+                    <span>{new Date(conv.started_at).toLocaleString()}</span>
+                    <span>·</span>
+                    <span>{conv.message_count} messages</span>
+                  </div>
+                </div>
+                <svg
+                  className={`w-4 h-4 text-[#6d7a76] transition-transform shrink-0 ${expandedId === conv.id ? 'rotate-180' : ''}`}
+                  fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {expandedId === conv.id && (
+                <div className="px-6 py-5 bg-[#FAFAF8] border-t border-[#E5E4DE] max-h-[500px] overflow-y-auto">
+                  {threadLoading ? (
+                    <div className="flex items-center justify-center py-6 gap-2 text-[#6d7a76] text-sm">
+                      <div className="w-4 h-4 rounded-full border-2 border-[#E5E4DE] border-t-[#1FA391] animate-spin" />
+                      Loading thread…
+                    </div>
+                  ) : threadMessages.length === 0 ? (
+                    <p className="text-center py-6 text-[#6d7a76] text-sm">No messages in this thread.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {threadMessages.map((msg: any, i: number) => (
+                        <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
+                          <div className={`max-w-[80%] px-4 py-3 rounded-2xl text-sm ${
+                            msg.role === 'user'
+                              ? 'bg-[#14171F] text-white rounded-tr-sm'
+                              : 'bg-[#E4F5F0] text-[#1FA391] rounded-tl-sm'
+                          }`}>
+                            {msg.content}
+                          </div>
+                          <span className="text-[10px] text-[#6d7a76] mt-1 px-1">
+                            {new Date(msg.created_at).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );

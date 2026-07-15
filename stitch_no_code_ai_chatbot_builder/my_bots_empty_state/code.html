@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BotSimple - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f2f3ff",
+                    "amber": "#E8A33D",
+                    "surface-bright": "#faf8ff",
+                    "signal-teal": "#1FA391",
+                    "tertiary-fixed": "#ffddb5",
+                    "on-primary-fixed": "#00201b",
+                    "secondary-container": "#d5e6e1",
+                    "on-secondary": "#ffffff",
+                    "paper": "#FAFAF8",
+                    "on-primary-container": "#00312a",
+                    "tertiary": "#835400",
+                    "secondary-fixed-dim": "#b9cac5",
+                    "primary": "#006b5e",
+                    "tertiary-container": "#c4851f",
+                    "surface-container": "#ecedf9",
+                    "ink": "#14171F",
+                    "surface-tint": "#006b5e",
+                    "border": "#E5E4DE",
+                    "on-tertiary-fixed": "#2a1800",
+                    "on-secondary-fixed": "#101e1b",
+                    "outline": "#6d7a76",
+                    "on-error": "#ffffff",
+                    "secondary": "#52625e",
+                    "primary-fixed": "#83f6e1",
+                    "on-tertiary-fixed-variant": "#643f00",
+                    "error-red": "#D64545",
+                    "on-primary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "background": "#faf8ff",
+                    "surface-container-highest": "#e0e2ed",
+                    "surface-container-high": "#e6e7f3",
+                    "secondary-fixed": "#d5e6e1",
+                    "surface": "#faf8ff",
+                    "amber-soft": "#FBEBD2",
+                    "primary-fixed-dim": "#65d9c6",
+                    "on-secondary-fixed-variant": "#3b4a46",
+                    "inverse-surface": "#2d3039",
+                    "primary-container": "#1fa391",
+                    "on-primary-fixed-variant": "#005046",
+                    "inverse-primary": "#65d9c6",
+                    "slate": "#6B7280",
+                    "on-secondary-container": "#586864",
+                    "surface-dim": "#d8d9e5",
+                    "soft-mint": "#E4F5F0",
+                    "on-surface": "#181b24",
+                    "tertiary-fixed-dim": "#ffb956",
+                    "success-green": "#2E9E5B",
+                    "on-background": "#181b24",
+                    "teal-dark": "#167A6D",
+                    "surface-variant": "#e0e2ed",
+                    "error-container": "#ffdad6",
+                    "outline-variant": "#bcc9c5",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#3d4946",
+                    "on-tertiary-container": "#3e2600",
+                    "inverse-on-surface": "#eff0fc",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "16px",
+                    "xl": "48px",
+                    "xs": "8px",
+                    "base": "8px",
+                    "max-width": "1200px",
+                    "lg": "32px",
+                    "giant": "96px",
+                    "xxl": "64px",
+                    "md": "24px"
+            },
+            "fontFamily": {
+                    "body": ["Inter"],
+                    "display-md": ["Space Grotesk"],
+                    "body-sm": ["Inter"],
+                    "caption": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "mono": ["JetBrains Mono"],
+                    "heading": ["Inter"],
+                    "display-lg": ["Space Grotesk"]
+            },
+            "fontSize": {
+                    "body": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "display-md": ["36px", {"lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-sm": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                    "caption": ["12px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "mono": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "heading": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "display-lg": ["56px", {"lineHeight": "1.05", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #faf8ff;
+        }
+    </style>
+</head>
+<body class="font-body text-body text-on-surface">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-paper border-r border-border flex flex-col py-md px-sm z-50">
+<div class="mb-xxl px-sm">
+<h1 class="font-heading text-heading text-ink">BotSimple</h1>
+<p class="font-body text-body-sm text-slate">Small Biz AI</p>
+</div>
+<nav class="flex-1 space-y-xs">
+<!-- Active State: Dashboard -->
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-primary font-bold bg-soft-mint transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body text-body-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-body text-body-sm">My Bots</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="leaderboard">leaderboard</span>
+<span class="font-body text-body-sm">Analytics</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body text-body-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-xs">
+<button class="w-full bg-signal-teal text-paper font-medium py-sm px-md rounded-xl hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-xs mb-md">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                Create New Bot
+            </button>
+<div class="pt-md border-t border-border space-y-xs">
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-body text-body-sm">Help Center</span>
+</a>
+<a class="flex items-center gap-sm px-sm py-xs rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-body text-body-sm">Sign Out</span>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen flex flex-col">
+<!-- TopNavBar Anchor -->
+<header class="w-full sticky top-0 bg-surface border-b border-border z-40">
+<div class="flex justify-between items-center h-16 px-lg max-w-max-width mx-auto">
+<div class="flex items-center gap-md">
+<h2 class="font-heading text-heading text-on-surface">Dashboard Overview</h2>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex items-center gap-lg">
+<a class="text-on-surface-variant font-medium hover:bg-soft-mint transition-colors duration-150 px-sm py-xs rounded-lg" href="#">Documentation</a>
+<a class="text-on-surface-variant font-medium hover:bg-soft-mint transition-colors duration-150 px-sm py-xs rounded-lg" href="#">Support</a>
+</div>
+<div class="w-10 h-10 rounded-full border border-border bg-surface-container flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A high-quality, professional headshot of a friendly business owner, illuminated with natural soft light. The photography style is modern and clean with a shallow depth of field, set against a blurred office background that utilizes the soft mint and signal teal brand colors. The mood is approachable and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCycs1MK2XykL5ejQTTLCTjCyEfCG4LmwfIyALlvifsakqGYYazb7uNFfb_0ddMYM30V5tWKjGUdLuWj0kIIY46OgYHvrH5WuXXE1VRyP8C1yh7W7MOD6hiv4rEQYhLejPNF4CySt6IIsQpsj-mkeO8iI541gaZUMFEHC6TPxdHbJWtFDzZnh0vvhhBrg6kWwcWaMjrxLsCn4yN3C3GnKbNOnOZSk0ghlKoywe7klAdC7amobuHTM7Brw"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 flex flex-col items-center justify-center p-lg">
+<!-- Empty State Container -->
+<div class="max-w-md w-full bg-paper border border-border rounded-xl p-xl text-center transition-all duration-300 hover:border-signal-teal/30">
+<div class="mb-lg inline-flex items-center justify-center w-24 h-24 rounded-full bg-surface-container-low text-slate">
+<span class="material-symbols-outlined text-[64px]" style="font-variation-settings: 'wght' 300;">smart_toy</span>
+</div>
+<h3 class="font-heading text-heading text-ink mb-sm">You haven't created any bots yet.</h3>
+<p class="font-body text-body text-on-surface-variant mb-xl leading-relaxed">
+                    Build your first AI assistant to handle customer queries, schedule appointments, and grow your business automatically.
+                </p>
+<div class="flex flex-col gap-sm">
+<button class="w-full bg-signal-teal text-paper font-semibold py-md px-xl rounded-xl hover:shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" data-icon="bolt">bolt</span>
+                        Create your first bot
+                    </button>
+<button class="w-full bg-transparent text-ink border border-border font-medium py-md px-xl rounded-xl hover:bg-soft-mint transition-all duration-150">
+                        View Sample Templates
+                    </button>
+</div>
+</div>
+<!-- Contextual Quick Help Grid (Bento style for empty state) -->
+<div class="max-w-max-width w-full mt-giant grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="bg-paper border border-border p-md rounded-xl hover:shadow-md transition-all">
+<div class="text-signal-teal mb-sm">
+<span class="material-symbols-outlined" data-icon="lightbulb">lightbulb</span>
+</div>
+<h4 class="font-heading text-body-lg font-bold text-ink mb-xs">What can bots do?</h4>
+<p class="font-body text-body-sm text-on-surface-variant">Automate FAQs, lead generation, and basic troubleshooting for your customers 24/7.</p>
+</div>
+<div class="bg-paper border border-border p-md rounded-xl hover:shadow-md transition-all">
+<div class="text-signal-teal mb-sm">
+<span class="material-symbols-outlined" data-icon="speed">speed</span>
+</div>
+<h4 class="font-heading text-body-lg font-bold text-ink mb-xs">Fast Setup</h4>
+<p class="font-body text-body-sm text-on-surface-variant">Connect your website in minutes with our simple "no-code" integration process.</p>
+</div>
+<div class="bg-paper border border-border p-md rounded-xl hover:shadow-md transition-all">
+<div class="text-signal-teal mb-sm">
+<span class="material-symbols-outlined" data-icon="psychology">psychology</span>
+</div>
+<h4 class="font-heading text-body-lg font-bold text-ink mb-xs">Learn from AI</h4>
+<p class="font-body text-body-sm text-on-surface-variant">Our bots learn from your existing business documents to provide accurate answers.</p>
+</div>
+</div>
+</div>
+<!-- Footer Anchor -->
+<footer class="w-full py-xl bg-surface-container border-t border-border">
+<div class="flex flex-col md:flex-row justify-between items-center max-w-max-width mx-auto px-lg">
+<div class="mb-md md:mb-0">
+<span class="font-heading text-heading text-on-surface">BotSimple</span>
+<p class="font-caption text-caption text-slate mt-xs">© 2024 BotSimple AI. All rights reserved.</p>
+</div>
+<div class="flex gap-lg">
+<a class="font-caption text-caption text-slate hover:text-primary transition-colors duration-150" href="#">Terms</a>
+<a class="font-caption text-caption text-slate hover:text-primary transition-colors duration-150" href="#">Privacy</a>
+<a class="font-caption text-caption text-slate hover:text-primary transition-colors duration-150" href="#">Contact</a>
+</div>
+</div>
+</footer>
+</main>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.classList.add('scale-95');
+            });
+            el.addEventListener('mouseup', () => {
+                el.classList.remove('scale-95');
+            });
+            el.addEventListener('mouseleave', () => {
+                el.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BotSimple - Bot Saved Successfully</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .success-pulse {
+            animation: pulse-border 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(46, 158, 91, 0.3); }
+            50% { border-color: rgba(46, 158, 91, 1); }
+        }
+        .toast-slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#835400",
+                        "secondary": "#52625e",
+                        "on-surface-variant": "#3d4946",
+                        "surface-container-highest": "#e0e2ed",
+                        "on-primary-fixed": "#00201b",
+                        "primary-fixed": "#83f6e1",
+                        "surface-bright": "#faf8ff",
+                        "outline-variant": "#bcc9c5",
+                        "on-secondary-fixed-variant": "#3b4a46",
+                        "tertiary-container": "#c4851f",
+                        "inverse-primary": "#65d9c6",
+                        "success-green": "#2E9E5B",
+                        "on-secondary-container": "#586864",
+                        "outline": "#6d7a76",
+                        "surface-container": "#ecedf9",
+                        "soft-mint": "#E4F5F0",
+                        "inverse-on-surface": "#eff0fc",
+                        "signal-teal": "#1FA391",
+                        "primary": "#006b5e",
+                        "on-tertiary-fixed": "#2a1800",
+                        "secondary-container": "#d5e6e1",
+                        "surface-container-high": "#e6e7f3",
+                        "on-tertiary-fixed-variant": "#643f00",
+                        "on-secondary-fixed": "#101e1b",
+                        "on-primary-fixed-variant": "#005046",
+                        "border": "#E5E4DE",
+                        "teal-dark": "#167A6D",
+                        "on-primary": "#ffffff",
+                        "surface": "#faf8ff",
+                        "on-primary-container": "#00312a",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#d5e6e1",
+                        "background": "#faf8ff",
+                        "tertiary-fixed": "#ffddb5",
+                        "paper": "#FAFAF8",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f2f3ff",
+                        "on-error": "#ffffff",
+                        "amber": "#E8A33D",
+                        "on-surface": "#181b24",
+                        "primary-container": "#1fa391",
+                        "slate": "#6B7280",
+                        "secondary-fixed-dim": "#b9cac5",
+                        "on-background": "#181b24",
+                        "inverse-surface": "#2d3039",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#65d9c6",
+                        "surface-dim": "#d8d9e5",
+                        "tertiary-fixed-dim": "#ffb956",
+                        "surface-tint": "#006b5e",
+                        "on-tertiary-container": "#3e2600",
+                        "on-secondary": "#ffffff",
+                        "ink": "#14171F",
+                        "error-red": "#D64545",
+                        "surface-variant": "#e0e2ed",
+                        "surface-container-lowest": "#ffffff",
+                        "amber-soft": "#FBEBD2"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xl": "48px",
+                        "max-width": "1200px",
+                        "base": "8px",
+                        "xxl": "64px",
+                        "xs": "8px",
+                        "lg": "32px",
+                        "giant": "96px",
+                        "sm": "16px",
+                        "md": "24px"
+                    },
+                    "fontFamily": {
+                        "mono": ["JetBrains Mono"],
+                        "display-md": ["Space Grotesk"],
+                        "display-lg": ["Space Grotesk"],
+                        "caption": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "body": ["Inter"],
+                        "heading": ["Inter"]
+                    },
+                    "fontSize": {
+                        "mono": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "display-md": ["36px", {"lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display-lg": ["56px", {"lineHeight": "1.05", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "caption": ["12px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-sm": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "body": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "heading": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-surface text-ink font-body">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-paper border-r border-border flex flex-col py-md px-sm z-50">
+<div class="mb-xl px-sm">
+<h1 class="font-heading text-heading text-ink">BotSimple</h1>
+<p class="font-body text-body-sm text-secondary">Small Biz AI</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-sm py-2 rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body text-body-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-sm py-2 rounded-lg text-primary font-bold bg-soft-mint transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<span class="font-body text-body-sm">My Bots</span>
+</a>
+<a class="flex items-center gap-3 px-sm py-2 rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-body text-body-sm">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-sm py-2 rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body text-body-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-md border-t border-border">
+<a class="flex items-center gap-3 px-sm py-2 rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body text-body-sm">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-sm py-2 rounded-lg text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body text-body-sm">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 min-h-screen bg-surface">
+<!-- Header -->
+<header class="w-full h-16 sticky top-0 bg-surface border-b border-border flex justify-between items-center px-lg z-40">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">arrow_back</span>
+<h2 class="font-heading text-heading text-on-surface">Edit Bot: Customer Support Hero</h2>
+</div>
+<div class="flex items-center gap-sm">
+<button class="px-sm py-2 text-secondary font-body text-body-sm hover:bg-soft-mint rounded-lg transition-all active:scale-95">Discard</button>
+<!-- SUCCESS STATE BUTTON -->
+<button class="bg-success-green text-paper px-md py-2 rounded-xl flex items-center gap-2 font-body text-body-sm transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                    Saved
+                </button>
+</div>
+</header>
+<div class="max-w-max-width mx-auto p-lg">
+<!-- Success Toast Notification -->
+<div class="toast-slide-in mb-lg flex items-center gap-3 bg-soft-mint border border-success-green/30 p-md rounded-xl text-ink">
+<span class="material-symbols-outlined text-success-green" style="font-variation-settings: 'FILL' 1;">verified</span>
+<div>
+<p class="font-body text-body font-semibold">Bot settings updated successfully</p>
+<p class="font-body text-body-sm text-secondary">Your changes are now live for all visitors.</p>
+</div>
+<button class="ml-auto text-secondary hover:text-ink" onclick="this.parentElement.remove()">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Editor Grid -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Configuration Form (Left) -->
+<section class="col-span-7 space-y-lg">
+<!-- General Settings Card -->
+<div class="bg-paper border border-border rounded-xl p-lg transition-all hover:shadow-md">
+<div class="flex items-center gap-2 mb-md">
+<span class="material-symbols-outlined text-signal-teal">tune</span>
+<h3 class="font-heading text-body-lg font-bold">Identity &amp; Personality</h3>
+</div>
+<div class="space-y-md">
+<div class="space-y-2">
+<label class="font-body text-body-sm font-semibold">Bot Name</label>
+<input class="w-full bg-paper border border-border rounded-xl p-md focus:ring-2 focus:ring-signal-teal focus:border-signal-teal outline-none transition-all" placeholder="Enter bot name..." type="text" value="Customer Support Hero"/>
+</div>
+<div class="space-y-2">
+<label class="font-body text-body-sm font-semibold">Greeting Message</label>
+<textarea class="w-full bg-paper border border-border rounded-xl p-md focus:ring-2 focus:ring-signal-teal focus:border-signal-teal outline-none transition-all" placeholder="How should the bot introduce itself?" rows="3">Hi there! I'm your local support hero. How can I help you grow your business today?</textarea>
+</div>
+</div>
+</div>
+<!-- Knowledge Base Card -->
+<div class="bg-paper border border-border rounded-xl p-lg transition-all hover:shadow-md">
+<div class="flex items-center gap-2 mb-md">
+<span class="material-symbols-outlined text-signal-teal">book_5</span>
+<h3 class="font-heading text-body-lg font-bold">Knowledge Sources</h3>
+</div>
+<div class="space-y-md">
+<div class="flex items-center justify-between p-md border border-border rounded-xl bg-surface-container-lowest">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">language</span>
+<div>
+<p class="font-body text-body-sm font-semibold">website_docs_v2.pdf</p>
+<p class="font-caption text-caption text-secondary">Added 2 hours ago</p>
+</div>
+</div>
+<span class="bg-soft-mint text-success-green px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">Synced</span>
+</div>
+<button class="w-full py-md border-2 border-dashed border-border rounded-xl text-secondary font-body text-body-sm hover:bg-soft-mint hover:border-signal-teal transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">add_circle</span>
+                                Upload New Document
+                            </button>
+</div>
+</div>
+<!-- Appearance Options -->
+<div class="bg-paper border border-border rounded-xl p-lg transition-all hover:shadow-md">
+<div class="flex items-center gap-2 mb-md">
+<span class="material-symbols-outlined text-signal-teal">palette</span>
+<h3 class="font-heading text-body-lg font-bold">Visual Theme</h3>
+</div>
+<div class="grid grid-cols-2 gap-md">
+<div class="p-md border border-signal-teal bg-soft-mint rounded-xl flex items-center gap-3 cursor-pointer">
+<div class="w-6 h-6 rounded-full bg-signal-teal"></div>
+<span class="font-body text-body-sm font-semibold">Signal Teal</span>
+</div>
+<div class="p-md border border-border rounded-xl flex items-center gap-3 cursor-pointer hover:bg-surface-container transition-all">
+<div class="w-6 h-6 rounded-full bg-on-surface"></div>
+<span class="font-body text-body-sm">Deep Ink</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Live Preview (Right) -->
+<section class="col-span-5">
+<div class="sticky top-24">
+<div class="flex items-center justify-between mb-sm px-sm">
+<h3 class="font-heading text-body-lg font-bold">Live Preview</h3>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-success-green animate-pulse"></span>
+<span class="font-body text-caption text-secondary">Real-time simulator</span>
+</div>
+</div>
+<!-- Chat Simulator Container -->
+<div class="bg-white border border-border rounded-2xl shadow-xl overflow-hidden flex flex-col h-[600px]">
+<!-- Chat Header -->
+<div class="bg-signal-teal p-md flex items-center gap-3 text-paper">
+<div class="w-10 h-10 rounded-full bg-paper/20 flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div>
+<p class="font-body text-body-sm font-bold">Customer Support Hero</p>
+<p class="font-caption text-caption opacity-80">Online &amp; Ready</p>
+</div>
+</div>
+<!-- Chat Messages Area -->
+<div class="flex-1 p-md space-y-md overflow-y-auto bg-surface-container-lowest">
+<div class="flex justify-start">
+<div class="bg-soft-mint text-ink p-md rounded-2xl rounded-tl-none max-w-[80%] font-body text-body-sm">
+                                        Hi there! I'm your local support hero. How can I help you grow your business today?
+                                    </div>
+</div>
+<div class="flex justify-end">
+<div class="bg-ink text-paper p-md rounded-2xl rounded-tr-none max-w-[80%] font-body text-body-sm">
+                                        I need help with my pricing plans.
+                                    </div>
+</div>
+<div class="flex justify-start">
+<div class="bg-soft-mint text-ink p-md rounded-2xl rounded-tl-none max-w-[80%] font-body text-body-sm">
+                                        I can certainly help with that! Based on your business size, our 'Growth' plan offers the best value. Would you like me to send a comparison link?
+                                    </div>
+</div>
+<!-- Human Fallback Message -->
+<div class="flex justify-start">
+<div class="bg-amber-soft text-ink p-md border border-amber/30 rounded-2xl rounded-tl-none max-w-[80%] font-body text-body-sm flex items-start gap-2">
+<span class="material-symbols-outlined text-amber text-[18px]" style="font-variation-settings: 'FILL' 1;">emergency_home</span>
+<span>I'm connecting you with a human agent for more specific billing questions...</span>
+</div>
+</div>
+</div>
+<!-- Chat Input Area -->
+<div class="p-md border-t border-border bg-paper">
+<div class="flex gap-2 items-center bg-surface-container rounded-xl px-md py-2">
+<input class="flex-1 bg-transparent border-none focus:ring-0 font-body text-body-sm outline-none" placeholder="Type a message..." type="text"/>
+<button class="text-signal-teal">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Widget Trigger Preview -->
+<div class="mt-lg flex justify-end px-sm">
+<div class="flex items-center gap-3">
+<p class="font-body text-caption text-secondary">Widget Style:</p>
+<div class="w-12 h-12 bg-signal-teal rounded-full flex items-center justify-center text-paper shadow-lg cursor-pointer hover:scale-105 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer Anchor -->
+<footer class="ml-64 bg-surface-container border-t border-border py-xl">
+<div class="flex flex-col md:flex-row justify-between items-center max-w-max-width mx-auto px-lg">
+<h4 class="font-heading text-body font-bold text-on-surface">BotSimple AI</h4>
+<p class="font-caption text-caption text-slate">© 2024 BotSimple AI. All rights reserved.</p>
+<div class="flex gap-md mt-md md:mt-0">
+<a class="font-caption text-caption text-slate hover:text-primary transition-colors duration-150" href="#">Terms</a>
+<a class="font-caption text-caption text-slate hover:text-primary transition-colors duration-150" href="#">Privacy</a>
+<a class="font-caption text-caption text-slate hover:text-primary transition-colors duration-150" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for the "Saved" button to return to normal after a while (UI simulation)
+        // Note: Real world would handle actual form state
+        document.querySelector('button.bg-success-green').addEventListener('click', function() {
+            this.classList.add('scale-95');
+            setTimeout(() => this.classList.remove('scale-95'), 150);
+        });
+    </script>
+</body></html>

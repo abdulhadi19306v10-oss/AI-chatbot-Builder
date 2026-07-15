@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BotSimple | My Bots Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-container-lowest": "#ffffff",
+                "surface-container-low": "#f2f3ff",
+                "amber": "#E8A33D",
+                "surface-bright": "#faf8ff",
+                "signal-teal": "#1FA391",
+                "tertiary-fixed": "#ffddb5",
+                "on-primary-fixed": "#00201b",
+                "secondary-container": "#d5e6e1",
+                "on-secondary": "#ffffff",
+                "paper": "#FAFAF8",
+                "on-primary-container": "#00312a",
+                "tertiary": "#835400",
+                "secondary-fixed-dim": "#b9cac5",
+                "primary": "#006b5e",
+                "tertiary-container": "#c4851f",
+                "surface-container": "#ecedf9",
+                "ink": "#14171F",
+                "surface-tint": "#006b5e",
+                "border": "#E5E4DE",
+                "on-tertiary-fixed": "#2a1800",
+                "on-secondary-fixed": "#101e1b",
+                "outline": "#6d7a76",
+                "on-error": "#ffffff",
+                "secondary": "#52625e",
+                "primary-fixed": "#83f6e1",
+                "on-tertiary-fixed-variant": "#643f00",
+                "error-red": "#D64545",
+                "on-primary": "#ffffff",
+                "error": "#ba1a1a",
+                "background": "#faf8ff",
+                "surface-container-highest": "#e0e2ed",
+                "surface-container-high": "#e6e7f3",
+                "secondary-fixed": "#d5e6e1",
+                "surface": "#faf8ff",
+                "amber-soft": "#FBEBD2",
+                "primary-fixed-dim": "#65d9c6",
+                "on-secondary-fixed-variant": "#3b4a46",
+                "inverse-surface": "#2d3039",
+                "primary-container": "#1fa391",
+                "on-primary-fixed-variant": "#005046",
+                "inverse-primary": "#65d9c6",
+                "slate": "#6B7280",
+                "on-secondary-container": "#586864",
+                "surface-dim": "#d8d9e5",
+                "soft-mint": "#E4F5F0",
+                "on-surface": "#181b24",
+                "tertiary-fixed-dim": "#ffb956",
+                "success-green": "#2E9E5B",
+                "on-background": "#181b24",
+                "teal-dark": "#167A6D",
+                "surface-variant": "#e0e2ed",
+                "error-container": "#ffdad6",
+                "outline-variant": "#bcc9c5",
+                "on-tertiary": "#ffffff",
+                "on-surface-variant": "#3d4946",
+                "on-tertiary-container": "#3e2600",
+                "inverse-on-surface": "#eff0fc",
+                "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                "DEFAULT": "4px",
+                "lg": "8px",
+                "xl": "12px",
+                "full": "9999px"
+            },
+            "spacing": {
+                "xs": "8px",
+                "base": "8px",
+                "sm": "16px",
+                "md": "24px",
+                "lg": "32px",
+                "xl": "48px",
+                "xxl": "64px",
+                "giant": "96px",
+                "max-width": "1200px",
+            },
+            "fontFamily": {
+                "body": ["Inter", "sans-serif"],
+                "display-md": ["Space Grotesk", "sans-serif"],
+                "body-sm": ["Inter", "sans-serif"],
+                "caption": ["Inter", "sans-serif"],
+                "body-lg": ["Inter", "sans-serif"],
+                "mono": ["JetBrains Mono", "monospace"],
+                "heading": ["Inter", "sans-serif"],
+                "display-lg": ["Space Grotesk", "sans-serif"]
+            },
+            "fontSize": {
+                "body": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                "display-md": ["36px", {"lineHeight": "1.1", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                "body-sm": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                "caption": ["12px", {"lineHeight": "1.3", "fontWeight": "500"}],
+                "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                "mono": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                "heading": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                "display-lg": ["56px", {"lineHeight": "1.05", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-item {
+            /* Handled by style_active_navigation JSON mapping */
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen flex">
+<!-- SideNavBar Anchor -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-paper border-r border-border flex flex-col py-md px-sm z-50">
+<div class="mb-xxl px-xs">
+<h2 class="font-heading text-heading text-ink">Admin Panel</h2>
+<p class="font-body text-body-sm text-secondary">Small Biz AI</p>
+</div>
+<nav class="flex-1 flex flex-col gap-xs">
+<!-- Mapping JSON tab_labels and tab_icons -->
+<a class="flex items-center gap-sm p-sm rounded-xl text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body text-body-sm">Dashboard</span>
+</a>
+<!-- Active State Logic: Mapping "My Bots" -->
+<a class="flex items-center gap-sm p-sm rounded-xl text-primary font-bold bg-soft-mint transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="font-body text-body-sm">My Bots</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-xl text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-body text-body-sm">Analytics</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-xl text-secondary hover:bg-surface-container transition-colors duration-150 cursor-pointer" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body text-body-sm">Settings</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-border pt-md flex flex-col gap-xs">
+<button class="bg-signal-teal text-paper rounded-xl py-sm px-md font-bold mb-md hover:bg-teal-dark active:scale-95 transition-all">
+                Create New Bot
+            </button>
+<a class="flex items-center gap-sm p-sm rounded-xl text-secondary hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-body text-body-sm">Help Center</span>
+</a>
+<a class="flex items-center gap-sm p-sm rounded-xl text-secondary hover:bg-surface-container transition-colors duration-150" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-body text-body-sm">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar Anchor -->
+<header class="w-full top-0 sticky bg-surface border-b border-border z-40">
+<div class="flex justify-between items-center h-16 px-lg max-w-max-width mx-auto">
+<div class="flex items-center gap-sm">
+<span class="font-display-md text-display-md text-primary">BotSimple</span>
+</div>
+<div class="hidden md:flex items-center gap-xl">
+<a class="font-body text-body text-on-surface-variant hover:bg-soft-mint px-sm py-xs rounded-lg transition-colors" href="#">Features</a>
+<a class="font-body text-body text-on-surface-variant hover:bg-soft-mint px-sm py-xs rounded-lg transition-colors" href="#">Pricing</a>
+<a class="font-body text-body text-on-surface-variant hover:bg-soft-mint px-sm py-xs rounded-lg transition-colors" href="#">About</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-secondary hover:text-primary transition-colors">search</button>
+<div class="h-8 w-8 rounded-full bg-surface-container-high border border-border flex items-center justify-center overflow-hidden cursor-pointer hover:border-primary transition-colors">
+<img class="h-full w-full object-cover" data-alt="A professional headshot of a friendly business owner, smiling, set against a clean studio background. The style is modern corporate with high-key soft lighting, featuring a light-mode aesthetic that feels professional yet approachable." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiI1Ogi1vP1Dtx1y3Eivx4b4Qz-T7Tlr71oA8gJmtf5nTK2v8o9Sl7v5p-rADpYG7WqpB5NsLEcuUkA6s1DPNjSnhqkDdt7FTBufJQE3Wlc6dpZ9H5Sj429LMzrv4n7OxtbuzeFdVj6JubnxjrJuVJBinEMTp60GM3Ygv1Xb7IGDhzSh8u3Mz8O1eY4tuMzxXG-ifdlXidttuJNhmM3Hv5drw4GqK83Ig4VD6mwVbhRsAQr8VIIkT9Aw"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Content Canvas -->
+<div class="flex-1 p-lg max-w-max-width mx-auto w-full">
+<!-- Hero Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-xl">
+<div>
+<h1 class="font-display-md text-display-md text-ink">My Bots</h1>
+<p class="font-body text-body text-secondary mt-xs">Manage and monitor your AI conversational agents in one place.</p>
+</div>
+<button class="bg-signal-teal text-paper rounded-xl px-xl py-sm font-bold flex items-center gap-xs hover:bg-teal-dark active:scale-95 transition-all shadow-sm">
+<span class="material-symbols-outlined">add</span>
+                    Create bot
+                </button>
+</div>
+<!-- Dashboard Stats Row (Atmospheric) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mb-xl">
+<div class="bg-paper border border-border p-md rounded-xl hover:shadow-lg transition-shadow duration-300">
+<p class="font-caption text-caption text-secondary uppercase tracking-wider">Total Interactions</p>
+<h3 class="font-heading text-heading text-ink mt-xs">12,482</h3>
+<div class="flex items-center gap-xs mt-xs text-success-green">
+<span class="material-symbols-outlined text-[18px]">trending_up</span>
+<span class="font-caption text-caption">+14% this month</span>
+</div>
+</div>
+<div class="bg-paper border border-border p-md rounded-xl hover:shadow-lg transition-shadow duration-300">
+<p class="font-caption text-caption text-secondary uppercase tracking-wider">Avg Response Time</p>
+<h3 class="font-heading text-heading text-ink mt-xs">1.2s</h3>
+<div class="flex items-center gap-xs mt-xs text-success-green">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+<span class="font-caption text-caption">Ultra-fast performance</span>
+</div>
+</div>
+<div class="bg-paper border border-border p-md rounded-xl hover:shadow-lg transition-shadow duration-300">
+<p class="font-caption text-caption text-secondary uppercase tracking-wider">Human Fallbacks</p>
+<h3 class="font-heading text-heading text-ink mt-xs">24</h3>
+<div class="flex items-center gap-xs mt-xs text-amber">
+<span class="material-symbols-outlined text-[18px]">emergency_home</span>
+<span class="font-caption text-caption">Requires attention</span>
+</div>
+</div>
+</div>
+<!-- Bots Bento/Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-lg">
+<!-- Card 1: Active Bot -->
+<div class="bg-paper border border-border p-md rounded-xl hover:shadow-xl transition-all duration-300 group cursor-pointer">
+<div class="flex justify-between items-start mb-md">
+<div class="h-12 w-12 rounded-full overflow-hidden bg-soft-mint border border-outline-variant flex items-center justify-center">
+<img class="w-8 h-8" data-alt="A minimalist, friendly AI avatar icon with soft curves and teal accents, designed for a modern customer support interface. The background is clean and bright, maintaining a helpful and professional corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU1A8FTAyGDbBejb_Wm971YcMZ5O6yFgVuMQ05eTZGfuwDcbaE4E3gowFSLgGOZGbZP1KxEqOGhp0w33ESgj3gtVZqpX50GOIhURyfvVXrxxWSCJR4ozauajEsI8vL6qcaOFkeIh-ukWGOlKbYbgKhOfvRQ06FKlB1Igd8w-k5rUbVguEfbMKQTA-zdZiMhLt5GaqyjTpZNxFB06-1ZvVjI_eRSRyj3iXBfc96ahJ5IK1acHdZlC52SQ"/>
+</div>
+<span class="px-sm py-xs bg-success-green/10 text-success-green rounded-full font-caption text-caption flex items-center gap-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-success-green animate-pulse"></span>
+                            Active
+                        </span>
+</div>
+<h3 class="font-heading text-heading text-ink group-hover:text-primary transition-colors">Customer Support</h3>
+<p class="font-body text-body-sm text-secondary mt-xs line-clamp-2">Handles general inquiries, ticket creation, and common FAQ resolutions 24/7.</p>
+<div class="mt-md pt-md border-t border-border flex items-center justify-between">
+<div class="flex -space-x-2">
+<div class="h-6 w-6 rounded-full border-2 border-paper bg-surface-container-highest"></div>
+<div class="h-6 w-6 rounded-full border-2 border-paper bg-surface-container-high"></div>
+</div>
+<span class="material-symbols-outlined text-secondary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<!-- Card 2: Training Bot -->
+<div class="bg-paper border border-border p-md rounded-xl hover:shadow-xl transition-all duration-300 group cursor-pointer">
+<div class="flex justify-between items-start mb-md">
+<div class="h-12 w-12 rounded-full overflow-hidden bg-surface-container-low border border-outline-variant flex items-center justify-center">
+<img class="w-8 h-8" data-alt="A clean, abstract robot face graphic with sleek geometric lines and a neutral gray color palette. It represents a bot currently in the training phase, fitting perfectly within a professional and minimalist dashboard UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuByk8jyoV2JX970KK1upnpYLvgeZZZjmPPeOIKGFZ805U0V3ADrmV2hVuP9v87t1wOV7rt0vvZUzkhzmz3kx3TzZ0hDrkCozmwi3nMnIpuXWXZHYRGEG48T5NZxCMsD4eP3bTQFpQswz4RV-mQjrGbpZz0t6FkEnUV3Zjh9wT7KzRaTmCUowsN4dyXMoU_8vYf-dfeyN7DygYkWiP7k-1KkbJhrappZmSJ3acvj9H5STR-ckXersC8PBg"/>
+</div>
+<span class="px-sm py-xs bg-slate/10 text-slate rounded-full font-caption text-caption flex items-center gap-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-slate"></span>
+                            Training
+                        </span>
+</div>
+<h3 class="font-heading text-heading text-ink group-hover:text-primary transition-colors">Sales Assistant</h3>
+<p class="font-body text-body-sm text-secondary mt-xs line-clamp-2">Qualifying leads and scheduling product demos via conversational logic.</p>
+<div class="mt-md pt-md border-t border-border flex items-center justify-between">
+<div class="w-full bg-surface-container-low h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[65%]" style="transition: width 1s ease-in-out;"></div>
+</div>
+<span class="font-caption text-caption text-secondary ml-md">65%</span>
+</div>
+</div>
+<!-- Card 3: Paused Bot -->
+<div class="bg-paper border border-border p-md rounded-xl hover:shadow-xl transition-all duration-300 group cursor-pointer">
+<div class="flex justify-between items-start mb-md">
+<div class="h-12 w-12 rounded-full overflow-hidden bg-surface-container-low border border-outline-variant flex items-center justify-center">
+<img class="w-8 h-8" data-alt="A minimalist tech icon representing a data analyst bot, featuring a subtle magnifying glass and node structure. The style is clean, corporate, and professional, using shades of gray and soft white." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9L4YpbmY4qxknNfltnRbKYll0OObD5wIGrCfaB6M4DcipJDgK1xygx-V0H_5C-AR9AkI0bzJrGZCFeIKhSEvf3khgnbR-dAdSbI3q-FFJPiGuu9kD5GDgSJ4oJ4GZ4mH-_9znJk_2VZxvOmJE8grQv9UEzkQeRKI5Mw-XXGn9kPr4riooJgfB3LsPOL_652ppeYaUYYEICQra9zApZzGmdZ1udDd-dF0-UxZpLyX62IfylvSOFmPIfA"/>
+</div>
+<span class="px-sm py-xs bg-slate/10 text-slate rounded-full font-caption text-caption flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px]">pause</span>
+                            Paused
+                        </span>
+</div>
+<h3 class="font-heading text-heading text-ink group-hover:text-primary transition-colors">Data Insight Bot</h3>
+<p class="font-body text-body-sm text-secondary mt-xs line-clamp-2">Summarizes weekly performance reports and emails them to stakeholders.</p>
+<div class="mt-md pt-md border-t border-border flex items-center justify-between">
+<span class="font-caption text-caption text-secondary italic">Inactive for 3 days</span>
+<span class="material-symbols-outlined text-secondary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<!-- Card 4: New Bot Template -->
+<div class="bg-soft-mint/30 border border-dashed border-primary/40 p-md rounded-xl hover:bg-soft-mint transition-all duration-300 flex flex-col items-center justify-center text-center cursor-pointer min-h-[220px]">
+<div class="h-12 w-12 rounded-full bg-paper border border-border flex items-center justify-center mb-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'wght' 600">add</span>
+</div>
+<h3 class="font-heading text-heading text-primary">New Bot Template</h3>
+<p class="font-body text-body-sm text-on-secondary-container mt-xs">Start from a pre-built industry template.</p>
+</div>
+</div>
+</div>
+<!-- Footer Anchor -->
+<footer class="w-full py-xl bg-surface-container border-t border-border mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center max-w-max-width mx-auto px-lg">
+<div class="mb-md md:mb-0">
+<span class="font-heading text-heading text-on-surface">BotSimple</span>
+<p class="font-caption text-caption text-slate mt-xs">© 2024 BotSimple AI. All rights reserved.</p>
+</div>
+<div class="flex gap-lg">
+<a class="font-caption text-caption text-slate hover:text-primary transition-colors duration-150" href="#">Terms</a>
+<a class="font-caption text-caption text-slate hover:text-primary transition-colors duration-150" href="#">Privacy</a>
+<a class="font-caption text-caption text-slate hover:text-primary transition-colors duration-150" href="#">Contact</a>
+</div>
+</div>
+</footer>
+</main>
+<script>
+        // Simple interactivity for demonstration
+        document.querySelectorAll('.hover\\:shadow-xl').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-4px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>
