@@ -12,8 +12,6 @@ def main():
         env = re.sub(r'NEXT_PUBLIC_BACKEND_URL=.*\n?', '', env)
         with open(env_path, "w", encoding="utf-8") as f: f.write(env)
 
-    print("Starting Database...")
-    subprocess.run("docker start chatbot-db", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
     print("Starting Backend & Frontend on Localhost...")
     bp = subprocess.Popen("npm run dev", cwd=os.path.join(BASE_DIR, r"Build\backend-node"), shell=True)

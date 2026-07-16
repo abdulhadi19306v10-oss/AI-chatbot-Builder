@@ -16,7 +16,6 @@ A modern, fast, and feature-rich AI Chatbot Builder that allows you to upload do
 ## 📋 Prerequisites
 - Node.js 18+
 - Python 3.11+ (for run.py)
-- Docker (for PostgreSQL + pgvector)
 
 ## 🛠️ Getting Started
 
@@ -46,13 +45,7 @@ NEXTAUTH_SECRET="any_random_string"
 NEXTAUTH_URL="http://localhost:3000"
 
 # Database
-DATABASE_URL="postgresql://postgres:devpass@127.0.0.1:5433/postgres"
-```
-
-### 3. Database Setup
-Ensure your Docker daemon is running, then create the Postgres/pgvector container:
-```bash
-docker run --name chatbot-db -e POSTGRES_PASSWORD=devpass -p 5433:5432 -d pgvector/pgvector:pg16
+DATABASE_URL="postgresql://neondb_owner:npg_7jRxChIm8WBL@ep-twilight-surf-azli3hmh.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
 ```
 
 ### 4. Run the Application
@@ -63,18 +56,6 @@ From the root folder, run one of the startup scripts depending on how you want t
 python run.py
 ```
 This script will start the db, Node.js backend on `8000`, and Next.js frontend on `3000`. Access at `http://localhost:3000`.
-
-**LAN Testing (Phone/Other devices):**
-```bash
-python run_lan.py
-```
-Auto-detects your LAN IP, updates the frontend `.env.local` automatically so Google Auth continues to work, and binds the server to your network.
-
-**Worldwide Testing (Ngrok):**
-```bash
-python run_ngrok.py
-```
-Starts the servers and opens two ngrok tunnels. You will need to manually copy the URLs into your `.env.local` as instructed in the console.
 
 ## 🌐 Embedding the Bot
 Once you have trained your bot by uploading documents via the Dashboard, you can embed it into any HTML website using the provided script tag. (Manage your bot in the dashboard to copy the specific widget script).
