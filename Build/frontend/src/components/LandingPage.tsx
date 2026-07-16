@@ -10,6 +10,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function LandingPage() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLightMode, setIsLightMode] = useState(false);
 
   useEffect(() => {
@@ -182,8 +183,117 @@ export default function LandingPage() {
 
   }, [isLightMode]); // Re-run effect when theme changes to redraw stars with correct color
 
+  // ponytail: cursor trail + click burst — single canvas, single rAF loop
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d')!;
+
+    let points: { x: number; y: number; age: number }[] = [];
+    type Particle = { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; size: number };
+    let particles: Particle[] = [];
+    const MAX_POINTS = 40;
+    let rafId: number;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    const onMove = (e: MouseEvent) => {
+      points.push({ x: e.clientX, y: e.clientY, age: 0 });
+      if (points.length > MAX_POINTS) points.shift();
+    };
+    window.addEventListener('mousemove', onMove);
+
+    const onClick = (e: MouseEvent) => {
+      const COUNT = 12;
+      for (let i = 0; i < COUNT; i++) {
+        const angle = (i / COUNT) * Math.PI * 2;
+        const speed = Math.random() * 3 + 1.5;
+        particles.push({
+          x: e.clientX, y: e.clientY,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 0,
+          maxLife: Math.random() * 20 + 25,
+          size: Math.random() * 3 + 2,
+        });
+      }
+      // ripple ring uses size: -1 as marker
+      particles.push({ x: e.clientX, y: e.clientY, vx: 0, vy: 0, life: 0, maxLife: 30, size: -1 });
+    };
+    window.addEventListener('click', onClick);
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // trail
+      points.forEach(p => { p.age += 1; });
+      points = points.filter(p => p.age < MAX_POINTS);
+      if (points.length >= 2) {
+        for (let i = 1; i < points.length; i++) {
+          const alpha = 1 - points[i].age / MAX_POINTS;
+          ctx.beginPath();
+          ctx.moveTo(points[i - 1].x, points[i - 1].y);
+          ctx.lineTo(points[i].x, points[i].y);
+          ctx.strokeStyle = `rgba(31, 163, 145, ${alpha * 0.85})`;
+          ctx.lineWidth = (1 - points[i].age / MAX_POINTS) * 3;
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          ctx.shadowColor = '#1FA391';
+          ctx.shadowBlur = 8;
+          ctx.stroke();
+        }
+      }
+
+      // click particles
+      particles.forEach(p => {
+        p.life += 1;
+        const t = p.life / p.maxLife;
+        const alpha = 1 - t;
+
+        if (p.size === -1) {
+          // expanding ripple ring
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, t * 40, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(0, 242, 254, ${alpha * 0.7})`;
+          ctx.lineWidth = 1.5;
+          ctx.shadowColor = '#00f2fe';
+          ctx.shadowBlur = 12;
+          ctx.stroke();
+        } else {
+          // dot particle
+          p.x += p.vx * (1 - t);
+          p.y += p.vy * (1 - t);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size * (1 - t * 0.7), 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(31, 163, 145, ${alpha})`;
+          ctx.shadowColor = '#1FA391';
+          ctx.shadowBlur = 6;
+          ctx.fill();
+        }
+      });
+      particles = particles.filter(p => p.life < p.maxLife);
+
+      rafId = requestAnimationFrame(draw);
+    };
+    draw();
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('click', onClick);
+    };
+  }, []);
+
   return (
     <div ref={containerRef} className={`min-h-screen ${isLightMode ? "bg-[#FAFAF8] text-[#14171F]" : "bg-[#030712] text-white"} transition-colors duration-500 overflow-hidden selection:bg-[#1FA391] selection:text-white relative font-sans`}>
+      {/* Cursor trail canvas */}
+      <canvas ref={canvasRef} className="fixed inset-0 z-[9999] pointer-events-none" />
       
       {/* --- ANIMATED BACKGROUND ORBS & STARS --- */}
       <div className="fixed inset-0 pointer-events-none z-0">
