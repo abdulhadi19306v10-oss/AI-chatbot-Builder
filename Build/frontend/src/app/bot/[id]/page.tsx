@@ -10,7 +10,7 @@ export default async function BotPage({ params }: { params: Promise<{ id: string
   const { id } = await params;
 
   return (
-    <AppShell session={session} pageTitle="Bot Management">
+    <AppShell session={session} pageTitle="Bot Management" botId={id}>
       <BotManager botId={id} />
     </AppShell>
   );

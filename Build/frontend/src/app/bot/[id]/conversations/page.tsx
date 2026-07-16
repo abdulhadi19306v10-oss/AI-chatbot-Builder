@@ -10,7 +10,7 @@ export default async function BotConversationsPage({ params }: { params: Promise
   const { id } = await params;
 
   return (
-    <AppShell session={session} pageTitle="Chat History">
+    <AppShell session={session} pageTitle="Chat History" botId={id}>
       <ChatHistoryList botId={id} />
     </AppShell>
   );

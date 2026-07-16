@@ -2,10 +2,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 
 @import "tailwindcss";
-@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ── Design-token custom properties ───────────────────────── */
-:root {
+:root, [data-theme="light"] {
   /* Brand */
   --color-signal-teal:   #1FA391;
   --color-teal-dark:     #167A6D;
@@ -28,9 +28,23 @@
   --color-error:         #D64545;
   --color-amber:         #E8A33D;
 
-  /* Font stacks (set by next/font/google via layout.tsx) */
   --font-sans:           var(--font-inter, "Inter", sans-serif);
   --font-display:        var(--font-space-grotesk, "Space Grotesk", sans-serif);
+}
+
+[data-theme="dark"] {
+  --color-signal-teal:   #2dd4bf; /* Teal 400 */
+  --color-teal-dark:     #14b8a6; /* Teal 500 */
+  --color-paper:         #0f172a; /* Slate 900 */
+  --color-card:          #1e293b; /* Slate 800 */
+  --color-surface-low:   #334155; /* Slate 700 */
+  --color-soft-mint:     #042f2e; /* Teal 950 */
+  --color-ink:           #f8fafc; /* Slate 50 */
+  --color-secondary:     #94a3b8; /* Slate 400 */
+  --color-border:        #334155; /* Slate 700 */
+  --color-success:       #4ade80;
+  --color-error:         #f87171;
+  --color-amber:         #fbbf24;
 }
 
 /* ── Tailwind theme extension ──────────────────────────────── */

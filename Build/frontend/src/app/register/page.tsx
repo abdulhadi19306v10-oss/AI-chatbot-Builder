@@ -57,12 +57,12 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-transparent flex items-center justify-center p-6 relative overflow-hidden">
       {/* Decorative teal blob — bottom left */}
       <div
         className="absolute bottom-0 left-0 w-96 h-96 rounded-full opacity-20 pointer-events-none"
         style={{
-          background: "radial-gradient(circle, #1FA391 0%, transparent 70%)",
+          background: "radial-gradient(circle, var(--color-signal-teal) 0%, transparent 70%)",
           transform: "translate(-30%, 30%)",
         }}
       />
@@ -70,14 +70,14 @@ export default function RegisterPage() {
       <div className="relative z-10 w-full max-w-md">
         {/* Logo above card */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-[#1FA391] flex items-center justify-center shadow-md">
+          <div className="w-10 h-10 rounded-xl bg-signal-teal flex items-center justify-center shadow-md">
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                 d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
           </div>
           <span
-            className="text-2xl font-bold text-[#14171F]"
+            className="text-2xl font-bold text-ink"
             style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
           >
             Chatbot Builder
@@ -85,19 +85,19 @@ export default function RegisterPage() {
         </div>
 
         {/* Card */}
-        <div className="bg-white border border-[#E5E4DE] rounded-2xl shadow-sm p-10">
+        <div className="bg-card border border-border rounded-2xl shadow-sm p-10">
           <div className="mb-8">
             <h1
-              className="text-3xl font-bold text-[#14171F] mb-1.5"
+              className="text-3xl font-bold text-ink mb-1.5"
               style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
             >
               Get started
             </h1>
-            <p className="text-[#6d7a76] text-[15px]">Build your first AI assistant in seconds.</p>
+            <p className="text-secondary text-[15px]">Build your first AI assistant in seconds.</p>
           </div>
 
           {error && (
-            <div className="mb-6 px-4 py-3 bg-red-50 border border-red-100 text-[#D64545] text-sm rounded-lg">
+            <div className="mb-6 px-4 py-3 bg-red-50 border border-red-100 text-error text-sm rounded-lg">
               {error}
             </div>
           )}
@@ -105,7 +105,7 @@ export default function RegisterPage() {
           <form onSubmit={handleRegister} className="space-y-5 mb-6">
             {/* Full Name */}
             <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#6d7a76] mb-1.5">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-secondary mb-1.5">
                 Full Name
               </label>
               <input
@@ -113,14 +113,14 @@ export default function RegisterPage() {
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-[#E5E4DE] bg-white text-[#14171F] placeholder:text-[#6d7a76] focus:outline-none focus:ring-2 focus:ring-[#1FA391] focus:border-[#1FA391] transition text-sm"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-card text-inkink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm"
                 placeholder="John Doe"
               />
             </div>
 
             {/* Work Email */}
             <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#6d7a76] mb-1.5">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-secondary mb-1.5">
                 Work Email
               </label>
               <input
@@ -128,14 +128,14 @@ export default function RegisterPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-[#E5E4DE] bg-white text-[#14171F] placeholder:text-[#6d7a76] focus:outline-none focus:ring-2 focus:ring-[#1FA391] focus:border-[#1FA391] transition text-sm"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-card text-inkink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm"
                 placeholder="you@company.com"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#6d7a76] mb-1.5">
+              <label className="block text-[11px] font-semibold uppercase tracking-wider text-secondary mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -145,13 +145,13 @@ export default function RegisterPage() {
                   minLength={6}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-11 rounded-lg border border-[#E5E4DE] bg-white text-[#14171F] placeholder:text-[#6d7a76] focus:outline-none focus:ring-2 focus:ring-[#1FA391] focus:border-[#1FA391] transition text-sm"
+                  className="w-full px-4 py-3 pr-11 rounded-lg border border-border bg-card text-inkink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute inset-y-0 right-0 px-3 flex items-center text-[#6d7a76] hover:text-[#14171F] transition"
+                  className="absolute inset-y-0 right-0 px-3 flex items-center text-signal-teal hover:text-teal-dark transition"
                   tabIndex={-1}
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -172,7 +172,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-4 bg-[#1FA391] hover:bg-[#167A6D] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
+              className="w-full py-3 px-4 bg-signal-teal hover:bg-teal-dark text-white font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
             >
               {loading ? "Creating account…" : "Create Account"}
             </button>
@@ -181,17 +181,17 @@ export default function RegisterPage() {
           {/* Divider */}
           <div className="relative mb-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[#E5E4DE]" />
+              <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-white text-[#6d7a76] font-medium">OR</span>
+              <span className="px-3 bg-card text-inksecondary font-medium">OR</span>
             </div>
           </div>
 
           {/* Google */}
           <button
             onClick={() => signIn("google", { callbackUrl: "/" })}
-            className="w-full py-3 px-4 bg-white border border-[#E5E4DE] text-[#14171F] font-medium rounded-lg hover:bg-[#FAFAF8] transition flex justify-center items-center gap-2.5 mb-6 text-sm"
+            className="w-full py-3 px-4 bg-card border border-border text-secondary font-medium rounded-lg hover:bg-paper transition flex justify-center items-center gap-2.5 mb-6 text-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -203,9 +203,9 @@ export default function RegisterPage() {
             Continue with Google
           </button>
 
-          <p className="text-center text-sm text-[#6d7a76]">
+          <p className="text-center text-sm text-secondary">
             Already have an account?{" "}
-            <Link href="/login" className="font-semibold text-[#1FA391] hover:text-[#167A6D] transition">
+            <Link href="/login" className="font-semibold text-signal-teal hover:text-teal-dark transition">
               Sign in
             </Link>
           </p>

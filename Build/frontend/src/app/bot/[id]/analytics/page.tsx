@@ -10,7 +10,7 @@ export default async function BotAnalyticsPage({ params }: { params: Promise<{ i
   const { id } = await params;
 
   return (
-    <AppShell session={session} pageTitle="Analytics">
+    <AppShell session={session} pageTitle="Analytics" botId={id}>
       <AnalyticsDashboard botId={id} />
     </AppShell>
   );

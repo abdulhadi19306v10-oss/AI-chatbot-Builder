@@ -75,7 +75,11 @@
     toggleBtn.addEventListener('click', () => {
       isOpen = !isOpen;
       chatBox.style.display = isOpen ? 'flex' : 'none';
-      toggleBtn.innerHTML = isOpen ? '✕' : avatarIcon;
+      
+      const isImage = avatarIcon.startsWith('data:image') || avatarIcon.startsWith('http');
+      const renderAvatar = () => isImage ? `<img src="${avatarIcon}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />` : avatarIcon;
+      
+      toggleBtn.innerHTML = isOpen ? '✕' : renderAvatar();
       notifyResize();
       if (isOpen && messages.children.length === 0) {
         appendMsg('bot', welcomeMsg);
@@ -96,8 +100,12 @@
           toggleBtn.style.color = 'white';
           header.style.background = themeColor;
           titleEl.textContent = config.name || 'Chatbot';
-          avatarEl.textContent = avatarIcon;
-          if (!isOpen) toggleBtn.innerHTML = avatarIcon;
+          
+          const isImage = avatarIcon.startsWith('data:image') || avatarIcon.startsWith('http');
+          const renderAvatar = () => isImage ? `<img src="${avatarIcon}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />` : avatarIcon;
+          
+          avatarEl.innerHTML = renderAvatar();
+          if (!isOpen) toggleBtn.innerHTML = renderAvatar();
         }
       } catch(e) {}
     }

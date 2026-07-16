@@ -100,13 +100,13 @@ export default function NotificationBell() {
       <button
         onClick={handleOpen}
         aria-label="Notifications"
-        className="relative p-2.5 rounded-lg bg-white border border-[#E5E4DE] text-[#6d7a76] hover:bg-[#FAFAF8] hover:text-[#14171F] transition-colors shadow-sm"
+        className="relative p-2.5 rounded-lg bg-card border border-border text-secondary hover:bg-paper hover:text-ink transition-colors shadow-sm"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-[#1FA391] text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
+          <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 bg-signal-teal text-white text-[10px] font-bold rounded-full flex items-center justify-center leading-none">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
@@ -114,12 +114,12 @@ export default function NotificationBell() {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-[#E5E4DE] rounded-xl shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-80 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
           {/* Header */}
-          <div className="px-4 py-3 border-b border-[#E5E4DE] flex items-center justify-between">
-            <h3 className="font-semibold text-[#14171F] text-sm">Notifications</h3>
+          <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+            <h3 className="font-semibold text-error text-sm">Notifications</h3>
             {leads.length > 0 && (
-              <span className="text-xs text-[#6d7a76]">
+              <span className="text-xs text-secondary">
                 {leads.length} lead{leads.length !== 1 ? "s" : ""} total
               </span>
             )}
@@ -129,10 +129,10 @@ export default function NotificationBell() {
           <div className="max-h-80 overflow-y-auto">
             {leads.length === 0 ? (
               <div className="py-10 text-center">
-                <svg className="w-8 h-8 text-[#E5E4DE] mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <svg className="w-8 h-8 text-secondary mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
-                <p className="text-sm text-[#6d7a76]">No leads yet</p>
+                <p className="text-sm text-secondary">No leads yet</p>
               </div>
             ) : (
               leads.map((lead, i) => {
@@ -140,27 +140,27 @@ export default function NotificationBell() {
                 return (
                   <div
                     key={i}
-                    className={`px-4 py-3 border-b border-[#E5E4DE]/60 last:border-0 flex items-start gap-3 transition-colors ${
-                      isUnread ? "bg-[#E4F5F0]/40" : "hover:bg-[#FAFAF8]"
+                    className={`px-4 py-3 border-b border-/60 last:border-0 flex items-start gap-3 transition-colors ${
+                      isUnread ? "bg-/40" : "hover:bg-card"
                     }`}
                   >
                     {/* Avatar initial */}
-                    <div className="w-8 h-8 rounded-full bg-[#1FA391] flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-full bg-paper flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">
                       {lead.name?.[0]?.toUpperCase() ?? "?"}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-semibold text-[#14171F] truncate">{lead.name || "Anonymous"}</p>
+                        <p className="text-sm font-semibold text-ink truncate">{lead.name || "Anonymous"}</p>
                         {isUnread && (
-                          <span className="w-2 h-2 rounded-full bg-[#1FA391] shrink-0" />
+                          <span className="w-2 h-2 rounded-full bg-signal-teal shrink-0" />
                         )}
                       </div>
-                      <p className="text-xs text-[#6d7a76] truncate">{lead.email}</p>
+                      <p className="text-xs text-secondary truncate">{lead.email}</p>
                       <div className="flex items-center gap-1.5 mt-1">
-                        <span className="text-[10px] bg-[#E4F5F0] text-[#1FA391] px-1.5 py-0.5 rounded-full font-medium truncate max-w-[120px]">
+                        <span className="text-[10px] bg-card text-ink px-1.5 py-0.5 rounded-full font-medium truncate max-w-[120px]">
                           {lead.bot_name}
                         </span>
-                        <span className="text-[10px] text-[#6d7a76]">{timeAgo(lead.created_at)}</span>
+                        <span className="text-[10px] text-secondary">{timeAgo(lead.created_at)}</span>
                       </div>
                     </div>
                   </div>

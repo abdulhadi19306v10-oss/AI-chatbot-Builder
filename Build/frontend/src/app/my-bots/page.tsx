@@ -12,10 +12,10 @@ export default function MyBotsPage() {
 
   if (!isLoaded) {
     return (
-      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
+      <div className="min-h-screen bg-paper flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 rounded-full border-2 border-[#E5E4DE] border-t-[#1FA391] animate-spin" />
-          <p className="text-sm text-[#6d7a76]">Loading…</p>
+          <div className="w-10 h-10 rounded-full border-2 border-border border-t-signal-teal animate-spin" />
+          <p className="text-sm text-secondary">Loading…</p>
         </div>
       </div>
     );

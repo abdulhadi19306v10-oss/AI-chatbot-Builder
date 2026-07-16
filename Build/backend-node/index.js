@@ -13,7 +13,7 @@ const analyticsRouter = require('./routes/analytics');
 const app = express();
 
 app.use(cors({ origin: '*' }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // Rate limit only the public chat endpoint — no auth and no per-user cap otherwise
 // ponytail: only apply where it's needed

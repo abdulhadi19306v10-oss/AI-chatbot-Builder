@@ -1,7 +1,8 @@
 "use client";
 import { getBackendUrl } from "../lib/config";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import gsap from "gsap";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
@@ -30,6 +31,26 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
     }
     loadBots();
   }, [session]);
+
+  // GSAP Animation when bots load
+  useEffect(() => {
+    if (bots.length > 0) {
+      gsap.fromTo(
+        ".bot-card",
+        { y: 20, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.4, stagger: 0.1, ease: "power2.out" }
+      );
+    }
+  }, [bots]);
+
+  // Stats Animation on mount
+  useEffect(() => {
+    gsap.fromTo(
+      ".stat-card",
+      { y: 15, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.5, stagger: 0.1, delay: 0.1, ease: "power2.out" }
+    );
+  }, []);
 
   const handleCreateBot = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,18 +116,18 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
       <div className="flex items-start justify-between">
         <div>
           <h1
-            className="text-3xl font-bold text-[#14171F]"
+            className="text-3xl font-bold text-ink"
             style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
           >
             My Bots
           </h1>
-          <p className="text-[#6d7a76] mt-1 text-[15px]">
+          <p className="text-secondary mt-1 text-[15px]">
             Create, manage and deploy your AI assistants.
           </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-[#1FA391] hover:bg-[#167A6D] text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-signal-teal hover:bg-teal-dark text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -117,17 +138,17 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
 
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-[#E5E4DE] rounded-xl p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#6d7a76] mb-2">Total Bots</p>
-          <p className="text-3xl font-bold text-[#14171F]">{bots.length}</p>
+        <div className="stat-card bg-card border border-border rounded-xl p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-secondary mb-2">Total Bots</p>
+          <p className="text-3xl font-bold text-ink">{bots.length}</p>
         </div>
-        <div className="bg-white border border-[#E5E4DE] rounded-xl p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#6d7a76] mb-2">Active Bots</p>
-          <p className="text-3xl font-bold text-[#1FA391]">{activeBots.length}</p>
+        <div className="stat-card bg-card border border-border rounded-xl p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-secondary mb-2">Active Bots</p>
+          <p className="text-3xl font-bold text-ink">{activeBots.length}</p>
         </div>
-        <div className="bg-white border border-[#E5E4DE] rounded-xl p-5 shadow-sm">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#6d7a76] mb-2">Deployments</p>
-          <p className="text-3xl font-bold text-[#14171F]">{bots.length}</p>
+        <div className="stat-card bg-card border border-border rounded-xl p-5 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-secondary mb-2">Deployments</p>
+          <p className="text-3xl font-bold text-ink">{bots.length}</p>
         </div>
       </div>
 
@@ -137,33 +158,34 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           {bots.map((bot) => (
             <div
               key={bot.id}
-              className="bg-white border border-[#E5E4DE] rounded-xl p-5 shadow-sm flex flex-col gap-4"
+              className="bot-card bg-card border border-border rounded-xl p-5 shadow-sm flex flex-col gap-4"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-bold text-[#14171F] text-[15px] leading-tight">{bot.name}</h3>
-                  <span className="inline-flex items-center mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E4F5F0] text-[#1FA391]">
+                  <h3 className="font-bold text-ink text-[15px] leading-tight">{bot.name}</h3>
+                  <span className="inline-flex items-center mt-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-card text-ink">
                     Active
                   </span>
                 </div>
-                <div className="w-9 h-9 rounded-lg bg-[#E4F5F0] flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5 text-[#1FA391]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
-                      d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                  </svg>
+                <div className="w-10 h-10 rounded-lg bg-soft-mint flex items-center justify-center shrink-0 overflow-hidden text-lg border border-border">
+                  {bot.avatar?.startsWith('data:image') || bot.avatar?.startsWith('http') ? (
+                    <img src={bot.avatar} className="w-full h-full object-cover" alt="Avatar" />
+                  ) : (
+                    bot.avatar || "🤖"
+                  )}
                 </div>
               </div>
 
               <div className="flex items-center gap-2 mt-auto">
                 <Link
                   href={`/bot/${bot.id}`}
-                  className="flex-1 text-center text-sm font-semibold text-[#1FA391] border border-[#1FA391] rounded-lg py-2 hover:bg-[#E4F5F0] transition-colors"
+                  className="flex-1 text-center text-sm font-semibold text-signal-teal border border-border rounded-lg py-2 hover:bg-paper transition-colors"
                 >
                   Manage
                 </Link>
                 <button
                   onClick={() => handleDeleteBot(bot.id, bot.name)}
-                  className="text-sm font-medium text-[#D64545] px-3 py-2 rounded-lg hover:bg-red-50 transition-colors"
+                  className="text-sm font-medium text-error px-3 py-2 rounded-lg hover:bg-red-50 transition-colors"
                 >
                   Delete
                 </button>
@@ -173,24 +195,24 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
         </div>
       ) : (
         /* Empty state */
-        <div className="border-2 border-dashed border-[#E5E4DE] rounded-xl p-12 text-center">
-          <div className="w-12 h-12 rounded-full bg-[#E4F5F0] flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-[#1FA391]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="border-2 border-dashed border-border rounded-xl p-12 text-center">
+          <div className="w-12 h-12 rounded-full bg-soft-mint flex items-center justify-center mx-auto mb-4">
+            <svg className="w-6 h-6 text-signal-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           </div>
           <h3
-            className="text-lg font-bold text-[#14171F] mb-2"
+            className="text-lg font-bold text-ink mb-2"
             style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
           >
             Create your first bot
           </h3>
-          <p className="text-[#6d7a76] text-sm mb-6">
+          <p className="text-error text-sm mb-6">
             No bots yet. Get started by creating your first AI assistant.
           </p>
           <button
             onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1FA391] hover:bg-[#167A6D] text-white text-sm font-semibold rounded-lg transition-colors"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-signal-teal hover:bg-teal-dark text-white text-sm font-semibold rounded-lg transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -210,18 +232,18 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           />
 
           {/* Modal card */}
-          <div className="relative bg-white border border-[#E5E4DE] rounded-2xl shadow-xl p-8 w-full max-w-sm z-10">
+          <div className="relative bg-card border border-border rounded-2xl shadow-xl p-8 w-full max-w-sm z-10">
             <h2
-              className="text-xl font-bold text-[#14171F] mb-1"
+              className="text-xl font-bold text-ink mb-1"
               style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
             >
               Create a new bot
             </h2>
-            <p className="text-[#6d7a76] text-sm mb-6">Give your bot a name to get started.</p>
+            <p className="text-error text-sm mb-6">Give your bot a name to get started.</p>
 
             <form onSubmit={handleCreateBot} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#6d7a76] mb-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-secondary mb-1.5">
                   Bot Name
                 </label>
                 <input
@@ -230,21 +252,21 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
                   placeholder="e.g. Sales Bot"
                   value={botName}
                   onChange={(e) => setBotName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-lg border border-[#E5E4DE] bg-white text-[#14171F] placeholder:text-[#6d7a76] focus:outline-none focus:ring-2 focus:ring-[#1FA391] focus:border-[#1FA391] transition text-sm"
+                  className="w-full px-4 py-3 rounded-lg border border-border bg-card text-inkink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm"
                 />
               </div>
               <div className="flex gap-3 pt-1">
                 <button
                   type="submit"
                   disabled={loading || !botName.trim()}
-                  className="flex-1 py-3 bg-[#1FA391] hover:bg-[#167A6D] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
+                  className="flex-1 py-3 bg-signal-teal hover:bg-teal-dark text-white font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
                 >
                   {loading ? "Creating…" : "Create Bot"}
                 </button>
                 <button
                   type="button"
                   onClick={() => { setShowModal(false); setBotName(""); }}
-                  className="px-5 py-3 border border-[#E5E4DE] text-[#14171F] font-medium rounded-lg hover:bg-[#FAFAF8] transition-colors text-sm"
+                  className="px-5 py-3 border border-border text-secondary font-medium rounded-lg hover:bg-paper transition-colors text-sm"
                 >
                   Cancel
                 </button>

@@ -15,6 +15,7 @@ export default function BotManager({ botId }: { botId: string }) {
   const [widgetCode, setWidgetCode] = useState<string>('');
   const [botToken, setBotToken] = useState<string>('');
   const [isDragging, setIsDragging] = useState(false);
+  const [isAvatarDragging, setIsAvatarDragging] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const [botName, setBotName] = useState('');
@@ -179,6 +180,20 @@ export default function BotManager({ botId }: { botId: string }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleAvatarUpload = (file: File) => {
+    if (file.size > 2 * 1024 * 1024) {
+      alert("Image must be smaller than 2MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      if (event.target?.result) {
+        setAvatar(event.target.result as string);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
   useEffect(() => {
     if (activeTab === "configuration") {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -227,34 +242,34 @@ export default function BotManager({ botId }: { botId: string }) {
   ];
 
   const inputClass =
-    "w-full px-4 py-3 rounded-lg border border-[#E5E4DE] bg-white text-[#14171F] placeholder:text-[#6d7a76] focus:outline-none focus:ring-2 focus:ring-[#1FA391] focus:border-[#1FA391] transition text-sm";
-  const labelClass = "block text-sm font-bold text-[#14171F] mb-1.5";
+    "w-full px-4 py-3 rounded-lg border border-border bg-card text-inkink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm";
+  const labelClass = "block text-sm font-bold text-ink mb-1.5";
 
   return (
     <div className="space-y-6">
       {/* Page heading */}
       <div>
         <h1
-          className="text-3xl font-bold text-[#14171F]"
+          className="text-3xl font-bold text-ink"
           style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
         >
           Customize Your Bot
         </h1>
-        <p className="text-[#6d7a76] mt-1 text-[15px]">
+        <p className="text-secondary mt-1 text-[15px]">
           Configure settings, upload documents, and deploy your widget.
         </p>
       </div>
 
       {/* Tab bar */}
-      <div className="flex items-center gap-1 bg-white border border-[#E5E4DE] rounded-xl p-1 w-fit">
+      <div className="flex items-center gap-1 bg-card border border-border rounded-xl p-1 w-fit">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`px-5 py-2 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === tab.id
-                ? "bg-[#1FA391] text-white shadow-sm"
-                : "text-[#6d7a76] hover:text-[#14171F] hover:bg-[#F5F5F3]"
+                ? "bg-signal-teal text-white shadow-sm"
+                : "text-signal-teal hover:text-teal-dark hover:bg-[#F5F5F3]"
             }`}
           >
             {tab.label}
@@ -266,53 +281,99 @@ export default function BotManager({ botId }: { botId: string }) {
       {activeTab === "configuration" && (
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Form — left */}
-          <div className="lg:col-span-3 bg-white border border-[#E5E4DE] rounded-xl p-6 shadow-sm">
+          <div className="lg:col-span-3 bg-card border border-border rounded-xl p-6 shadow-sm">
             <h2
-              className="text-lg font-bold text-[#14171F] mb-6"
+              className="text-lg font-bold text-ink mb-6"
               style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
             >
               Bot Configuration
             </h2>
             <form onSubmit={handleSaveConfig} className="space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className={labelClass}>Bot Name</label>
-                  <input
-                    type="text"
-                    value={botName}
-                    onChange={e => setBotName(e.target.value)}
-                    required
-                    className={inputClass}
-                    placeholder="My Bot"
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Avatar (Emoji)</label>
-                  <input
-                    type="text"
-                    maxLength={2}
-                    value={avatar}
-                    onChange={e => setAvatar(e.target.value)}
-                    placeholder="🤖"
-                    className={`${inputClass} text-xl`}
-                  />
-                </div>
-                <div>
-                  <label className={labelClass}>Theme Color</label>
-                  <div className="flex gap-3 items-center">
-                    <input
-                      type="color"
-                      value={color}
-                      onChange={e => setColor(e.target.value)}
-                      className="h-11 w-11 rounded-lg cursor-pointer border border-[#E5E4DE] p-0.5"
-                    />
+                <div className="flex flex-col gap-5">
+                  <div>
+                    <label className={labelClass}>Bot Name</label>
                     <input
                       type="text"
-                      value={color}
-                      onChange={e => setColor(e.target.value)}
-                      className={`${inputClass} flex-1 uppercase`}
+                      value={botName}
+                      onChange={e => setBotName(e.target.value)}
+                      required
+                      className={inputClass}
+                      placeholder="My Bot"
                     />
                   </div>
+                  <div>
+                    <label className={labelClass}>Theme Color</label>
+                    <div className="flex gap-3 items-center">
+                      <input
+                        type="color"
+                        value={color}
+                        onChange={e => setColor(e.target.value)}
+                        className="h-11 w-11 rounded-lg cursor-pointer border border-border p-0.5"
+                      />
+                      <input
+                        type="text"
+                        value={color}
+                        onChange={e => setColor(e.target.value)}
+                        className={`${inputClass} flex-1 uppercase`}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className={labelClass}>Bot Avatar</label>
+                  <label 
+                    className={`flex flex-col items-center justify-center w-full h-[124px] border-2 border-dashed rounded-xl cursor-pointer transition-colors ${
+                      isAvatarDragging 
+                        ? "border-signal-teal bg-card" 
+                        : "border-border bg-card hover:border-signal-teal hover:bg-paper"
+                    }`}
+                    onDragOver={(e) => { e.preventDefault(); setIsAvatarDragging(true); }}
+                    onDragLeave={() => setIsAvatarDragging(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setIsAvatarDragging(false);
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) handleAvatarUpload(file);
+                    }}
+                  >
+                    <input 
+                      type="file" 
+                      accept="image/png, image/jpeg, image/svg+xml" 
+                      className="hidden" 
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) handleAvatarUpload(e.target.files[0]);
+                      }} 
+                    />
+                    
+                    {avatar?.startsWith('data:image') || avatar?.startsWith('http') ? (
+                      <div className="relative group w-12 h-12 rounded-full overflow-hidden border border-border shadow-sm mb-2 shrink-0">
+                        <img src={avatar} className="w-full h-full object-cover" alt="Avatar" />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                          </svg>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-card border border-border shadow-sm mb-2 flex items-center justify-center text-xl shrink-0">
+                        {avatar || "🤖"}
+                      </div>
+                    )}
+                    
+                    <span className="text-xs font-medium text-secondary mt-1">
+                      <span className="text-signal-teal">Click to upload</span> or drag and drop
+                    </span>
+                    <span className="text-[10px] text-secondary mt-0.5">PNG, JPG, SVG up to 2MB</span>
+                  </label>
+                  {avatar && (
+                     <div className="flex justify-end mt-1.5">
+                        <button type="button" onClick={() => setAvatar("")} className="text-[11px] text-secondary font-medium hover:underline">
+                          Clear image
+                        </button>
+                     </div>
+                  )}
                 </div>
                 <div className="sm:col-span-2">
                   <label className={labelClass}>Welcome Message</label>
@@ -328,12 +389,12 @@ export default function BotManager({ botId }: { botId: string }) {
                 <button
                   type="submit"
                   disabled={savingConfig}
-                  className="px-6 py-3 bg-[#1FA391] hover:bg-[#167A6D] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
+                  className="px-6 py-3 bg-signal-teal hover:bg-teal-dark text-white font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
                 >
                   {savingConfig ? "Saving…" : "Save Configuration"}
                 </button>
                 {saveSuccess && (
-                  <span className="text-[#2E9E5B] font-medium flex items-center gap-1.5 text-sm">
+                  <span className="text-secondary font-medium flex items-center gap-1.5 text-sm">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                     </svg>
@@ -345,19 +406,23 @@ export default function BotManager({ botId }: { botId: string }) {
           </div>
 
           {/* Preview panel — right */}
-          <div className="lg:col-span-2 bg-[#FAFAF8] border border-[#E5E4DE] rounded-xl overflow-hidden shadow-sm flex flex-col h-[500px]">
+          <div className="lg:col-span-2 bg-card border border-border rounded-xl overflow-hidden shadow-sm flex flex-col h-[500px]">
             {/* Chat Header */}
             <div className="p-4 text-white flex items-center gap-3 font-bold" style={{ background: color }}>
-              <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center text-xl shrink-0">
-                {avatar || "🤖"}
+              <div className="w-9 h-9 rounded-full bg-/20 flex items-center justify-center text-xl shrink-0 overflow-hidden">
+                {avatar?.startsWith('data:image') || avatar?.startsWith('http') ? (
+                  <img src={avatar} className="w-full h-full object-cover" alt="Avatar" />
+                ) : (
+                  avatar || "🤖"
+                )}
               </div>
               <span>{botName || "Chatbot"}</span>
             </div>
             
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-white/50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-/50">
               <div className="flex justify-start">
-                 <div className="max-w-[85%] p-3 rounded-xl rounded-tl-sm text-[14.5px] border border-[#E5E4DE] bg-white text-[#14171F]">
+                 <div className="max-w-[85%] p-3 rounded-xl rounded-tl-sm text-[14.5px] border border-border bg-card text-ink">
                    {welcomeMsg}
                  </div>
               </div>
@@ -368,7 +433,7 @@ export default function BotManager({ botId }: { botId: string }) {
                     className={`max-w-[85%] p-3 rounded-xl text-[14.5px] whitespace-pre-wrap ${
                       m.role === 'user' 
                         ? 'text-white rounded-tr-sm' 
-                        : 'border border-[#E5E4DE] bg-white text-[#14171F] rounded-tl-sm'
+                        : 'border border-border bg-card text-ink rounded-tl-sm'
                     }`}
                     style={m.role === 'user' ? { background: color } : {}}
                   >
@@ -379,10 +444,10 @@ export default function BotManager({ botId }: { botId: string }) {
               
               {previewLoading && (
                 <div className="flex justify-start">
-                  <div className="p-4 rounded-xl rounded-tl-sm border border-[#E5E4DE] bg-white flex gap-1.5 items-center h-[46px]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#14171F]/40 animate-bounce" />
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#14171F]/40 animate-bounce" style={{ animationDelay: '0.15s' }} />
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#14171F]/40 animate-bounce" style={{ animationDelay: '0.3s' }} />
+                  <div className="p-4 rounded-xl rounded-tl-sm border border-border bg-paper flex gap-1.5 items-center h-[46px]">
+                    <div className="w-1.5 h-1.5 rounded-full bg-/40 animate-bounce" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-/40 animate-bounce" style={{ animationDelay: '0.15s' }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-/40 animate-bounce" style={{ animationDelay: '0.3s' }} />
                   </div>
                 </div>
               )}
@@ -390,13 +455,13 @@ export default function BotManager({ botId }: { botId: string }) {
             </div>
             
             {/* Chat Input */}
-            <form onSubmit={handlePreviewSubmit} className="p-3 bg-white border-t border-[#E5E4DE] flex gap-2">
+            <form onSubmit={handlePreviewSubmit} className="p-3 bg-card border-t border-border flex gap-2">
               <input 
                 type="text" 
                 value={previewInput} 
                 onChange={e => setPreviewInput(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 px-4 py-2 border border-[#E5E4DE] rounded-full text-sm outline-none focus:border-[#1FA391] transition-colors"
+                className="flex-1 px-4 py-2 border border-border rounded-full text-sm outline-none focus:border-signal-teal transition-colors"
                 style={previewInput.trim() ? { borderColor: color } : {}}
               />
               <button 
@@ -416,9 +481,9 @@ export default function BotManager({ botId }: { botId: string }) {
 
       {/* ── Knowledge Base tab ────────────────────────── */}
       {activeTab === "knowledge" && (
-        <div className="bg-white border border-[#E5E4DE] rounded-xl p-6 shadow-sm space-y-6">
+        <div className="bg-card border border-border rounded-xl p-6 shadow-sm space-y-6">
           <h2
-            className="text-lg font-bold text-[#14171F]"
+            className="text-lg font-bold text-ink"
             style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
           >
             Knowledge Base
@@ -428,30 +493,30 @@ export default function BotManager({ botId }: { botId: string }) {
           {docs.length > 0 && (
             <div className="space-y-2">
               {docs.map((doc) => (
-                <div key={doc.id} className="flex flex-col p-4 border border-[#E5E4DE] rounded-xl bg-[#FAFAF8]">
+                <div key={doc.id} className="flex flex-col p-4 border border-border rounded-xl bg-card">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-[#E4F5F0] flex items-center justify-center shrink-0">
-                        <svg className="w-4 h-4 text-[#1FA391]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-8 h-8 rounded-lg bg-soft-mint flex items-center justify-center shrink-0">
+                        <svg className="w-4 h-4 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
-                      <span className="font-medium text-[#14171F] text-sm">{doc.filename}</span>
+                      <span className="font-medium text-ink text-sm">{doc.filename}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
                         doc.status === 'ready'
-                          ? 'bg-[#E4F5F0] text-[#1FA391]'
+                          ? 'bg-card text-ink'
                           : doc.status === 'failed'
-                          ? 'bg-red-50 text-[#D64545]'
-                          : 'bg-amber-50 text-[#E8A33D]'
+                          ? 'bg-red-50 text-error'
+                          : 'bg-amber-50 text-amber'
                       }`}>
                         {doc.status === 'ready' ? 'Ready' : doc.status === 'failed' ? 'Failed' : 'Training'}
                       </span>
                       <button
                         onClick={() => handleDeleteDoc(doc.id)}
-                        className="text-[#6d7a76] hover:text-[#D64545] transition-colors"
+                        className="text-signal-teal hover:text-teal-dark transition-colors"
                         title="Delete document"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,7 +526,7 @@ export default function BotManager({ botId }: { botId: string }) {
                     </div>
                   </div>
                   {doc.status === 'failed' && doc.error_message && (
-                    <p className="text-xs text-[#D64545] mt-2 bg-red-50 p-2 rounded border border-red-100">{doc.error_message}</p>
+                    <p className="text-xs text-error mt-2 bg-red-50 p-2 rounded border border-red-100">{doc.error_message}</p>
                   )}
                 </div>
               ))}
@@ -491,8 +556,8 @@ export default function BotManager({ botId }: { botId: string }) {
               }}
               className={`relative border-2 border-dashed rounded-xl p-10 text-center transition-colors ${
                 isDragging
-                  ? 'border-[#1FA391] bg-[#E4F5F0]'
-                  : 'border-[#E5E4DE] bg-[#FAFAF8] hover:border-[#1FA391] hover:bg-[#E4F5F0]/30'
+                  ? 'border-signal-teal bg-soft-mint'
+                  : 'border-border bg-card hover:border-signal-teal hover:bg-soft-mint/30'
               }`}
             >
               <input
@@ -507,28 +572,28 @@ export default function BotManager({ botId }: { botId: string }) {
                 title=""
               />
               <div className="pointer-events-none flex flex-col items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[#E4F5F0] flex items-center justify-center">
-                  <svg className="w-6 h-6 text-[#1FA391]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 rounded-full bg-paper flex items-center justify-center">
+                  <svg className="w-6 h-6 text-signal-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
                       d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                 </div>
-                <p className="text-[#14171F] font-semibold text-sm">
+                <p className="text-ink font-semibold text-sm">
                   Drag and drop your files here, or click to browse
                 </p>
-                <p className="text-xs text-[#6d7a76]">
+                <p className="text-xs text-secondary">
                   Supports PDF, DOCX, TXT
                 </p>
               </div>
             </div>
 
             {files.length > 0 && (
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-[#E4F5F0] p-4 border border-[#1FA391]/20 rounded-xl">
-                <span className="text-sm text-[#14171F] font-medium">{files.length} file(s) selected</span>
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-paper p-4 border border-border/20 rounded-xl">
+                <span className="text-sm text-secondary font-medium">{files.length} file(s) selected</span>
                 <button
                   type="submit"
                   disabled={uploading}
-                  className="w-full sm:w-auto px-6 py-2.5 bg-[#1FA391] hover:bg-[#167A6D] text-white font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
+                  className="w-full sm:w-auto px-6 py-2.5 bg-signal-teal hover:bg-teal-dark text-white font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
                 >
                   {uploading ? "Uploading…" : "Upload & Train"}
                 </button>
@@ -541,47 +606,47 @@ export default function BotManager({ botId }: { botId: string }) {
       {/* ── Deploy Widget tab ─────────────────────────── */}
       {activeTab === "deploy" && (
         <div className="space-y-5">
-          <div className="bg-white border border-[#E5E4DE] rounded-xl p-6 shadow-sm">
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
             <h2
-              className="text-lg font-bold text-[#14171F] mb-1"
+              className="text-lg font-bold text-ink mb-1"
               style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
             >
               Deploy Widget
             </h2>
-            <p className="text-[#6d7a76] text-sm mb-5">
+            <p className="text-secondary text-sm mb-5">
               Paste this code right before the closing{" "}
-              <code className="bg-[#E4F5F0] text-[#1FA391] px-1.5 py-0.5 rounded text-xs font-mono">&lt;/body&gt;</code>{" "}
+              <code className="bg-paper text-ink px-1.5 py-0.5 rounded border border-border text-xs font-mono">&lt;/body&gt;</code>{" "}
               tag on your website.
             </p>
 
-            <div className="relative">
-              <pre className="bg-[#14171F] text-white p-5 rounded-xl overflow-x-auto text-sm font-mono leading-relaxed">
+            <div className="relative group">
+              <pre className="bg-[#0a0a0a] text-gray-200 p-5 rounded-xl overflow-x-auto text-sm font-mono leading-relaxed border border-border/10">
                 <code>{widgetCode}</code>
               </pre>
               <button
                 onClick={handleCopyCode}
-                className="absolute top-3 right-3 text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg transition font-medium"
+                className="absolute top-3 right-3 text-xs bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-lg transition font-medium opacity-0 group-hover:opacity-100"
               >
                 {copied ? "Copied!" : "Copy"}
               </button>
             </div>
           </div>
 
-          <div className="bg-white border border-[#E5E4DE] rounded-xl p-6 shadow-sm flex items-center justify-between gap-4">
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm flex items-center justify-between gap-4">
             <div>
               <h3
-                className="font-bold text-[#14171F] text-base mb-1"
+                className="font-bold text-ink text-base mb-1"
                 style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
               >
                 Test Your Bot
               </h3>
-              <p className="text-sm text-[#6d7a76]">View a live preview of your bot on a demo landing page.</p>
+              <p className="text-sm text-secondary">View a live preview of your bot on a demo landing page.</p>
             </div>
             <a
               href={`${getBackendUrl()}/widget/demo.html?bot_token=${botToken}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="shrink-0 px-5 py-2.5 bg-[#1FA391] hover:bg-[#167A6D] text-white font-semibold rounded-lg transition-colors text-sm"
+              className="shrink-0 px-5 py-2.5 bg-signal-teal hover:bg-teal-dark text-white font-semibold rounded-lg transition-colors text-sm"
             >
               Open Live Demo
             </a>

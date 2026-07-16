@@ -28,10 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} antialiased bg-paper text-ink`}>
         <AuthProviders>
-          {/* ThemeProvider kept for compatibility — light only in practice */}
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+          <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem={false}>
             {children}
           </ThemeProvider>
         </AuthProviders>
