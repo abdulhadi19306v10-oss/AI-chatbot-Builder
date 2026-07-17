@@ -125,7 +125,9 @@ router.get('/:id/leads', requireAuth, ownBot, async (req, res) => {
 
 // GET /bots/:id/embed-snippet
 router.get('/:id/embed-snippet', requireAuth, ownBot, (req, res) => {
-  const origin = process.env.BACKEND_URL || `http://localhost:${process.env.PORT || 8000}`;
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.get('host');
+  const origin = process.env.BACKEND_URL || `${protocol}://${host}`;
   const snippet = `<script src="${origin}/widget/widget.js" data-bot-token="${req.bot.bot_token}" defer></script>`;
   res.json({ snippet, bot_token: req.bot.bot_token });
 });
