@@ -15,6 +15,13 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('new=1')) {
+      setShowModal(true);
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
+
+  useEffect(() => {
     async function loadBots() {
       const token = await getToken();
       if (!token || token === "test") return;

@@ -195,7 +195,7 @@ export default function AppShell({
         <div className="px-3 pb-4 space-y-1 border-t border-border pt-3">
           {/* Create New Bot button */}
           <Link
-            href="/dashboard"
+            href="/my-bots?new=1"
             className="flex items-center justify-center gap-2 w-full py-2.5 px-3 bg-signal-teal hover:bg-teal-dark text-white text-sm font-semibold rounded-lg transition-colors mb-3"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

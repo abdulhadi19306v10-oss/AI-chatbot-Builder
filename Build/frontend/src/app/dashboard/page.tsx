@@ -139,7 +139,7 @@ export default function DashboardPage() {
               Build your first AI assistant in minutes — no code required.
             </p>
             <Link
-              href="/my-bots"
+              href="/my-bots?new=1"
               className="inline-flex items-center gap-2 px-6 py-3 bg-signal-teal hover:bg-teal-dark text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
