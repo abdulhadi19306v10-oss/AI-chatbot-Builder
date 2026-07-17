@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import Joyride, { STATUS } from "react-joyride";
 
 export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id: string; name: string }[]) => void }) {
   const { data: session } = useSession();
@@ -13,6 +14,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   const [loading, setLoading] = useState(false);
   const [botName, setBotName] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.search.includes('new=1')) {
@@ -34,7 +36,10 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           setBots(data);
           onBotsChange?.(data);
         }
-      } catch (e) {}
+      } catch (e) {
+      } finally {
+        setInitialLoadDone(true);
+      }
     }
     loadBots();
   }, [session]);
@@ -118,7 +123,30 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   const activeBots = bots.filter(b => b.status !== "failed");
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 relative">
+      <Joyride
+        steps={[
+          {
+            target: '#tour-create-bot-btn',
+            content: 'Welcome! Let\'s start by creating your very first AI assistant.',
+            disableBeacon: true,
+          }
+        ]}
+        run={initialLoadDone && bots.length === 0 && !showModal}
+        continuous={true}
+        showProgress={false}
+        showSkipButton={true}
+        styles={{
+          options: {
+            primaryColor: '#00d2b9', // signal-teal
+            zIndex: 10000,
+          },
+          overlay: {
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+          }
+        }}
+      />
+      
       {/* Page header */}
       <div className="flex items-start justify-between">
         <div>
@@ -133,8 +161,9 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           </p>
         </div>
         <button
+          id="tour-create-bot-btn"
           onClick={() => setShowModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-signal-teal hover:bg-teal-dark text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
+          className="flex items-center gap-2 px-4 py-2.5 bg-signal-teal hover:bg-teal-dark text-white text-sm font-semibold rounded-lg transition-colors shadow-sm relative z-[10001]"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
