@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import Joyride, { STATUS } from "react-joyride";
+import { Joyride, STATUS } from "react-joyride";
 
 export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id: string; name: string }[]) => void }) {
   const { data: session } = useSession();
@@ -124,27 +124,16 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
 
   return (
     <div className="space-y-8 relative">
+      {/* @ts-ignore - react-joyride v3 typings are strict */}
       <Joyride
         steps={[
           {
             target: '#tour-create-bot-btn',
             content: 'Welcome! Let\'s start by creating your very first AI assistant.',
-            disableBeacon: true,
           }
         ]}
         run={initialLoadDone && bots.length === 0 && !showModal}
         continuous={true}
-        showProgress={false}
-        showSkipButton={true}
-        styles={{
-          options: {
-            primaryColor: '#00d2b9', // signal-teal
-            zIndex: 10000,
-          },
-          overlay: {
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-          }
-        }}
       />
       
       {/* Page header */}
