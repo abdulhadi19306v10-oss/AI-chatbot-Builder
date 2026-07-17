@@ -120,33 +120,58 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Empty state — only shown when loaded and no bots exist */}
+        {/* Empty state tutorial */}
         {!loadingSummary && summary.bots === 0 && (
-          <div className="border-2 border-dashed border-border rounded-xl p-12 text-center">
-            <div className="w-14 h-14 rounded-full bg-soft-mint flex items-center justify-center mx-auto mb-4">
-              <svg className="w-7 h-7 text-signal-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75}
-                  d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
+          <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
+            <div className="max-w-2xl mx-auto">
+              <h2 className="text-2xl font-bold text-ink mb-2" style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}>
+                Welcome to Chatbot Builder! 🎉
+              </h2>
+              <p className="text-secondary text-[15px] mb-8">
+                It looks like you haven't created any bots yet. Follow these 4 simple steps to build and deploy your first custom AI assistant.
+              </p>
+              
+              <div className="space-y-6 mb-8">
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-signal-teal text-white flex items-center justify-center font-bold shrink-0">1</div>
+                  <div>
+                    <h4 className="font-bold text-ink text-[15px]">Create your bot</h4>
+                    <p className="text-sm text-secondary">Click the button below to give your AI assistant a name.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-paper border border-border text-ink flex items-center justify-center font-bold shrink-0">2</div>
+                  <div>
+                    <h4 className="font-bold text-ink text-[15px]">Train it on your data</h4>
+                    <p className="text-sm text-secondary">Upload PDFs or text files so the bot learns about your business.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-paper border border-border text-ink flex items-center justify-center font-bold shrink-0">3</div>
+                  <div>
+                    <h4 className="font-bold text-ink text-[15px]">Customize appearance</h4>
+                    <p className="text-sm text-secondary">Change the colors, avatar, and welcome message to match your brand.</p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-paper border border-border text-ink flex items-center justify-center font-bold shrink-0">4</div>
+                  <div>
+                    <h4 className="font-bold text-ink text-[15px]">Deploy to your website</h4>
+                    <p className="text-sm text-secondary">Copy a simple script tag and paste it into your site to go live!</p>
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                href="/my-bots?new=1"
+                className="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-6 py-3 bg-signal-teal hover:bg-teal-dark text-white text-[15px] font-semibold rounded-lg transition-colors shadow-sm"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Create Your First Bot Now
+              </Link>
             </div>
-            <h2
-              className="text-xl font-bold text-ink mb-2"
-              style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
-            >
-              You haven&apos;t created a bot yet
-            </h2>
-            <p className="text-secondary text-sm mb-6 max-w-xs mx-auto">
-              Build your first AI assistant in minutes — no code required.
-            </p>
-            <Link
-              href="/my-bots?new=1"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-signal-teal hover:bg-teal-dark text-white text-sm font-semibold rounded-lg transition-colors shadow-sm"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Create your first bot
-            </Link>
           </div>
         )}
 

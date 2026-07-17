@@ -201,31 +201,57 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           ))}
         </div>
       ) : (
-        /* Empty state */
-        <div className="border-2 border-dashed border-border rounded-xl p-12 text-center">
-          <div className="w-12 h-12 rounded-full bg-soft-mint flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-signal-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+        /* Empty state tutorial */
+        <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl font-bold text-ink mb-2" style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}>
+              Welcome to Chatbot Builder! 🎉
+            </h2>
+            <p className="text-secondary text-[15px] mb-8">
+              It looks like you haven't created any bots yet. Follow these 4 simple steps to build and deploy your first custom AI assistant.
+            </p>
+            
+            <div className="space-y-6 mb-8">
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-signal-teal text-white flex items-center justify-center font-bold shrink-0">1</div>
+                <div>
+                  <h4 className="font-bold text-ink text-[15px]">Create your bot</h4>
+                  <p className="text-sm text-secondary">Click the button below to give your AI assistant a name.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-paper border border-border text-ink flex items-center justify-center font-bold shrink-0">2</div>
+                <div>
+                  <h4 className="font-bold text-ink text-[15px]">Train it on your data</h4>
+                  <p className="text-sm text-secondary">Upload PDFs or text files so the bot learns about your business.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-paper border border-border text-ink flex items-center justify-center font-bold shrink-0">3</div>
+                <div>
+                  <h4 className="font-bold text-ink text-[15px]">Customize appearance</h4>
+                  <p className="text-sm text-secondary">Change the colors, avatar, and welcome message to match your brand.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-paper border border-border text-ink flex items-center justify-center font-bold shrink-0">4</div>
+                <div>
+                  <h4 className="font-bold text-ink text-[15px]">Deploy to your website</h4>
+                  <p className="text-sm text-secondary">Copy a simple script tag and paste it into your site to go live!</p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowModal(true)}
+              className="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-6 py-3 bg-signal-teal hover:bg-teal-dark text-white text-[15px] font-semibold rounded-lg transition-colors shadow-sm"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Create Your First Bot Now
+            </button>
           </div>
-          <h3
-            className="text-lg font-bold text-ink mb-2"
-            style={{ fontFamily: "var(--font-display, 'Space Grotesk', sans-serif)" }}
-          >
-            Create your first bot
-          </h3>
-          <p className="text-error text-sm mb-6">
-            No bots yet. Get started by creating your first AI assistant.
-          </p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-signal-teal hover:bg-teal-dark text-white text-sm font-semibold rounded-lg transition-colors"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Create bot
-          </button>
         </div>
       )}
 
