@@ -6,8 +6,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
     const backendUrl = process.env.BACKEND_URL || "http://127.0.0.1:8000";
     return [
+      { source: '/auth', destination: `${backendUrl}/auth` },
       { source: '/auth/:path*', destination: `${backendUrl}/auth/:path*` },
+      { source: '/bots', destination: `${backendUrl}/bots` },
       { source: '/bots/:path*', destination: `${backendUrl}/bots/:path*` },
+      { source: '/chat', destination: `${backendUrl}/chat` },
       { source: '/chat/:path*', destination: `${backendUrl}/chat/:path*` },
       { source: '/widget/:path*', destination: `${backendUrl}/widget/:path*` },
     ]
