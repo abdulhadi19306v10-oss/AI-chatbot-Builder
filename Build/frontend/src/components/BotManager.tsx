@@ -22,6 +22,7 @@ export default function BotManager({ botId }: { botId: string }) {
       window.history.replaceState(null, '', window.location.pathname);
     }
   }, []);
+  const [iframeKey, setIframeKey] = useState(0);
   const [widgetCode, setWidgetCode] = useState<string>('');
   const [botToken, setBotToken] = useState<string>('');
   const [isDragging, setIsDragging] = useState(false);
@@ -35,11 +36,6 @@ export default function BotManager({ botId }: { botId: string }) {
   const [savingConfig, setSavingConfig] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   
-  const [messages, setMessages] = useState<{role: string, content: string}[]>([]);
-  const [previewInput, setPreviewInput] = useState('');
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
   const [activeTab, setActiveTab] = useState<Tab>("configuration");
 
   // Fetch bot data and documents on load
@@ -173,6 +169,7 @@ export default function BotManager({ botId }: { botId: string }) {
       });
       if (res.ok) {
         setSaveSuccess(true);
+        setIframeKey(k => k + 1);
         setTimeout(() => setSaveSuccess(false), 3000);
       } else {
         alert("Failed to save bot configuration.");
@@ -202,47 +199,6 @@ export default function BotManager({ botId }: { botId: string }) {
       }
     };
     reader.readAsDataURL(file);
-  };
-
-  useEffect(() => {
-    if (activeTab === "configuration") {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [messages, previewLoading, welcomeMsg, activeTab]);
-
-  const handlePreviewSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!previewInput.trim() || !botToken || previewLoading) return;
-    
-    const userMsg = previewInput.trim();
-    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
-    setPreviewInput('');
-    setPreviewLoading(true);
-    
-    try {
-      let sessionId = sessionStorage.getItem('preview_session_' + botToken);
-      if (!sessionId) {
-        sessionId = Math.random().toString(36).substring(2);
-        sessionStorage.setItem('preview_session_' + botToken, sessionId);
-      }
-      
-      const res = await fetch(`${getBackendUrl()}/chat/${botToken}/message`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId, message: userMsg })
-      });
-      
-      const data = await res.json();
-      if (res.ok) {
-        setMessages(prev => [...prev, { role: 'bot', content: data.reply || data.error }]);
-      } else {
-        setMessages(prev => [...prev, { role: 'bot', content: data.error || 'Failed to connect.' }]);
-      }
-    } catch (err) {
-      setMessages(prev => [...prev, { role: 'bot', content: 'Network error.' }]);
-    } finally {
-      setPreviewLoading(false);
-    }
   };
 
   const TABS: { id: Tab; label: string }[] = [
@@ -436,75 +392,23 @@ export default function BotManager({ botId }: { botId: string }) {
           </div>
 
           {/* Preview panel — right */}
-          <div className="lg:col-span-2 bg-card border border-border rounded-xl overflow-hidden shadow-sm flex flex-col h-[500px]">
-            {/* Chat Header */}
-            <div className="p-4 text-white flex items-center gap-3 font-bold" style={{ background: color }}>
-              <div className="w-9 h-9 rounded-full bg-/20 flex items-center justify-center text-xl shrink-0 overflow-hidden">
-                {avatar?.startsWith('data:image') || avatar?.startsWith('http') ? (
-                  <img src={avatar} className="w-full h-full object-cover" alt="Avatar" />
-                ) : (
-                  avatar || "🤖"
-                )}
-              </div>
-              <span>{botName || "Chatbot"}</span>
-            </div>
-            
-            {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-/50">
-              <div className="flex justify-start">
-                 <div className="max-w-[85%] p-3 rounded-xl rounded-tl-sm text-[14.5px] border border-border bg-card text-ink">
-                   {welcomeMsg}
-                 </div>
-              </div>
-              
-              {messages.map((m, i) => (
-                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div 
-                    className={`max-w-[85%] p-3 rounded-xl text-[14.5px] whitespace-pre-wrap ${
-                      m.role === 'user' 
-                        ? 'text-white rounded-tr-sm' 
-                        : 'border border-border bg-card text-ink rounded-tl-sm'
-                    }`}
-                    style={m.role === 'user' ? { background: color } : {}}
-                  >
-                    {m.content}
-                  </div>
+          <div className="lg:col-span-2 relative bg-gray-50 border border-border rounded-xl overflow-hidden shadow-sm flex flex-col h-[600px] justify-center items-center">
+            {!botToken ? (
+              <div className="text-secondary text-sm">Loading preview...</div>
+            ) : (
+              <>
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 pointer-events-none opacity-50" />
+                <p className="absolute top-4 left-4 text-xs font-bold text-secondary uppercase tracking-wider z-10">Live Preview</p>
+                <div className="relative z-10 w-[380px] h-[550px] bg-transparent rounded-2xl overflow-hidden shadow-2xl border border-border/50">
+                  <iframe 
+                    key={iframeKey}
+                    src={`${getBackendUrl()}/widget/iframe.html?bot_token=${botToken}`}
+                    className="w-full h-full border-none"
+                    title="Bot Preview"
+                  />
                 </div>
-              ))}
-              
-              {previewLoading && (
-                <div className="flex justify-start">
-                  <div className="p-4 rounded-xl rounded-tl-sm border border-border bg-paper flex gap-1.5 items-center h-[46px]">
-                    <div className="w-1.5 h-1.5 rounded-full bg-/40 animate-bounce" />
-                    <div className="w-1.5 h-1.5 rounded-full bg-/40 animate-bounce" style={{ animationDelay: '0.15s' }} />
-                    <div className="w-1.5 h-1.5 rounded-full bg-/40 animate-bounce" style={{ animationDelay: '0.3s' }} />
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-            
-            {/* Chat Input */}
-            <form onSubmit={handlePreviewSubmit} className="p-3 bg-card border-t border-border flex gap-2">
-              <input 
-                type="text" 
-                value={previewInput} 
-                onChange={e => setPreviewInput(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1 px-4 py-2 border border-border rounded-full text-sm outline-none focus:border-signal-teal transition-colors"
-                style={previewInput.trim() ? { borderColor: color } : {}}
-              />
-              <button 
-                type="submit" 
-                disabled={previewLoading || !previewInput.trim() || !botToken}
-                className="w-10 h-10 rounded-full text-white flex items-center justify-center shrink-0 disabled:opacity-50 transition-opacity"
-                style={{ background: color }}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              </button>
-            </form>
+              </>
+            )}
           </div>
         </div>
       )}
