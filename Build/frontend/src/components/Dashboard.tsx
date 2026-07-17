@@ -89,6 +89,8 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
         });
         setBotName("");
         setShowModal(false);
+        // Navigate to the bot manager with tour flag enabled
+        window.location.href = `/bot/${bot.id}?tour=1`;
       } else {
         const errData = await res.json().catch(() => null);
         alert(`Failed to create bot: ${errData?.detail || res.statusText}`);

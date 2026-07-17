@@ -3,6 +3,7 @@ import { getBackendUrl } from "../lib/config";
 
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
+import { Joyride } from "react-joyride";
 
 type Tab = "configuration" | "knowledge" | "deploy";
 
@@ -12,6 +13,15 @@ export default function BotManager({ botId }: { botId: string }) {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [docs, setDocs] = useState<any[]>([]);
+  const [runTour, setRunTour] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.search.includes('tour=1')) {
+      setRunTour(true);
+      // Optional: remove query param after starting tour
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
   const [widgetCode, setWidgetCode] = useState<string>('');
   const [botToken, setBotToken] = useState<string>('');
   const [isDragging, setIsDragging] = useState(false);
@@ -246,7 +256,26 @@ export default function BotManager({ botId }: { botId: string }) {
   const labelClass = "block text-sm font-bold text-ink mb-1.5";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* @ts-ignore */}
+      <Joyride
+        steps={[
+          {
+            target: '#tour-tab-configuration',
+            content: 'First, customize your bot\'s name, avatar, and welcome message. Don\'t forget to click Save!',
+          },
+          {
+            target: '#tour-tab-knowledge',
+            content: 'Next, upload documents here so your bot can learn about your business.',
+          },
+          {
+            target: '#tour-tab-deploy',
+            content: 'Finally, go here to grab your embed script and deploy the bot to your website!',
+          }
+        ]}
+        run={runTour}
+        continuous={true}
+      />
       {/* Page heading */}
       <div>
         <h1
@@ -265,6 +294,7 @@ export default function BotManager({ botId }: { botId: string }) {
         {TABS.map((tab) => (
           <button
             key={tab.id}
+            id={`tour-tab-${tab.id}`}
             onClick={() => setActiveTab(tab.id)}
             className={`px-5 py-2 rounded-lg text-sm font-semibold transition-colors ${
               activeTab === tab.id
