@@ -19,7 +19,8 @@ export const authOptions: AuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
         try {
-          const res = await fetch("http://127.0.0.1:8000/auth/login", {
+          const backend = process.env.BACKEND_URL || "http://127.0.0.1:8000";
+          const res = await fetch(`${backend}/auth/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: credentials.email, password: credentials.password })
