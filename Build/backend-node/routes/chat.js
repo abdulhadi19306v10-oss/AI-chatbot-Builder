@@ -6,8 +6,8 @@ const router = require('express').Router();
 router.get('/:bot_token/config', async (req, res) => {
   try {
     const { rows } = await pool.query(
-      'SELECT name, avatar, color, welcome_msg FROM bots WHERE bot_token=$1 AND status=$2',
-      [req.params.bot_token, 'active']
+      "SELECT name, avatar, color, welcome_msg FROM bots WHERE bot_token=$1 AND status != 'paused'",
+      [req.params.bot_token]
     );
     if (!rows[0]) return res.status(404).json({ error: 'Bot not active or not found' });
     res.json(rows[0]);
@@ -29,8 +29,8 @@ router.post('/:bot_token/message', async (req, res) => {
 
   // Resolve bot by public token (never exposes internal UUID to callers)
   const { rows: botRows } = await pool.query(
-    'SELECT id, welcome_msg FROM bots WHERE bot_token=$1 AND status=$2',
-    [req.params.bot_token, 'active']
+    "SELECT id, welcome_msg FROM bots WHERE bot_token=$1 AND status != 'paused'",
+    [req.params.bot_token]
   );
   if (!botRows[0]) return res.status(404).json({ error: 'Bot not found or not active' });
   const bot = botRows[0];
