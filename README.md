@@ -1,5 +1,7 @@
 # 🤖 Custom RAG AI Chatbot Builder Platform
 
+🔗 **Live Application**: [ai-chatbot-builder-ten.vercel.app](https://ai-chatbot-builder-ten.vercel.app/)
+
 A production-ready, multi-tenant software platform that enables businesses to build, train, and deploy custom AI assistants onto their websites via a simple embedded widget script. The platform handles the entire Retrieval-Augmented Generation (RAG) pipeline, from document parsing and custom tokenized chunking to vector search and AI response generation.
 
 ---
