@@ -1,7 +1,7 @@
 "use client";
 import { getBackendUrl } from "../lib/config";
 
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import gsap from "gsap";
 import { useSession } from "next-auth/react";
 import Link from "next/link";

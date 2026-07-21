@@ -22,6 +22,9 @@ export default function BotManager({ botId }: { botId: string }) {
     setMounted(true);
   }, []);
 
+  // Stable boolean so useMemo dep and step body use the exact same value
+  const hasReadyDoc = docs.length > 0 && docs.some((d: any) => d.status === "ready");
+
   const steps = useMemo(() => [
     {
       target: "#tour-bot-name",
@@ -57,7 +60,7 @@ export default function BotManager({ botId }: { botId: string }) {
       target: "#tour-kb-status",
       title: "Training Status",
       content: "Once this shows 'Ready', your bot can answer questions using the document.",
-      showNextButton: docs.some(d => d.status === "ready"),
+      showNextButton: hasReadyDoc,
       spotlightRadius: 8,
     },
     {
@@ -78,7 +81,8 @@ export default function BotManager({ botId }: { botId: string }) {
       title: "All Set! 🎉",
       content: "Your custom chatbot is now ready. Replay this tour anytime from the menu.",
     }
-  ], [docs.length > 0 && docs.some((d: any) => d.status === "ready")]);
+  ], [hasReadyDoc]);
+
 
   const {
     runTour: globalRunTour,
@@ -333,8 +337,6 @@ export default function BotManager({ botId }: { botId: string }) {
     "w-full px-4 py-3 rounded-lg border border-border bg-card text-inkink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm";
   const labelClass = "block text-sm font-bold text-ink mb-1.5";
   const JoyrideComponent = Joyride as any;
-
-
 
   return (
     <div className="space-y-6 relative">
