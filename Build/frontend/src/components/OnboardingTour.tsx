@@ -58,7 +58,7 @@ export const OnboardingTooltip = ({
               {...primaryProps}
               className="px-4 py-2 bg-signal-teal hover:bg-teal-dark text-white text-sm font-semibold rounded-lg transition-colors cursor-pointer"
             >
-              {isLastStep ? "Finish" : (index === 0 ? "Start" : "Next")}
+              {isLastStep ? "Finish" : ((step as any).isStartStep ? "Start" : "Next")}
             </button>
           )}
         </div>

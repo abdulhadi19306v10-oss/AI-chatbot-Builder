@@ -171,12 +171,14 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
               placement: "center",
               title: "Welcome to Chatbot Builder! 🎉",
               content: "Let's set up your first custom AI chatbot in a few simple steps.",
+              isStartStep: true,
             },
             {
               target: "#tour-create-bot-btn",
               title: "Create Your First Bot",
               content: "Click this button to name and customize your new assistant.",
               showNextButton: false,
+              spotlightRadius: 8,
             }
           ] as any[]}
           run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0 && !showModal}
