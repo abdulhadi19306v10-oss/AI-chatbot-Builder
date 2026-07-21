@@ -12,11 +12,13 @@ export const OnboardingTooltip = ({
   skipProps,
   size,
   isLastStep,
+  tooltipProps,
 }: TooltipRenderProps) => {
   const showNext = (step as any).showNextButton !== false;
 
   return (
     <div
+      {...tooltipProps}
       className="bg-card border border-border rounded-xl p-5 shadow-2xl max-w-sm text-left flex flex-col gap-4 relative z-[10002]"
       style={{
         fontFamily: "var(--font-sans)",
