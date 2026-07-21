@@ -1,7 +1,7 @@
 "use client";
 import { getBackendUrl } from "../lib/config";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import gsap from "gsap";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -39,6 +39,23 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   const [showModal, setShowModal] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  const steps = useMemo(() => [
+    {
+      target: "body",
+      placement: "center",
+      title: "Welcome to Chatbot Builder! 🎉",
+      content: "Let's set up your first custom AI chatbot in a few simple steps.",
+      isStartStep: true,
+    },
+    {
+      target: "#tour-create-bot-btn",
+      title: "Create Your First Bot",
+      content: "Click this button to name and customize your new assistant.",
+      showNextButton: false,
+      spotlightRadius: 8,
+    }
+  ], []);
 
   useEffect(() => {
     setMounted(true);
@@ -165,22 +182,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
     <div className="space-y-8 relative">
       {mounted && (
         <JoyrideComponent
-          steps={[
-            {
-              target: "body",
-              placement: "center",
-              title: "Welcome to Chatbot Builder! 🎉",
-              content: "Let's set up your first custom AI chatbot in a few simple steps.",
-              isStartStep: true,
-            },
-            {
-              target: "#tour-create-bot-btn",
-              title: "Create Your First Bot",
-              content: "Click this button to name and customize your new assistant.",
-              showNextButton: false,
-              spotlightRadius: 8,
-            }
-          ] as any[]}
+          steps={steps as any[]}
           run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0 && !showModal}
           stepIndex={currentStep}
           callback={handleJoyrideCallback}
