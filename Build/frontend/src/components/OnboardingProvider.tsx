@@ -4,6 +4,21 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 import { useSession } from "next-auth/react";
 import { getBackendUrl } from "@/lib/config";
 
+if (typeof window !== "undefined") {
+  const originalError = console.error;
+  console.error = (...args: any[]) => {
+    const msg = args[0];
+    if (
+      typeof msg === "string" &&
+      msg.includes("React does not recognize the") &&
+      msg.includes("borderRadius")
+    ) {
+      return;
+    }
+    originalError(...args);
+  };
+}
+
 interface OnboardingContextProps {
   onboardingCompletedAt: string | null;
   onboardingStep: number;
