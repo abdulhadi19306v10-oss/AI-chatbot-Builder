@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { Joyride } from "react-joyride";
 import { useOnboarding } from "@/components/OnboardingProvider";
 import { OnboardingTooltip, joyrideStyles, useReducedMotion } from "@/components/OnboardingTour";
+import { useSearchParams } from "next/navigation";
 
 type Tab = "configuration" | "knowledge" | "deploy";
 
@@ -83,9 +84,23 @@ export default function BotManager({ botId }: { botId: string }) {
     runTour: globalRunTour,
     currentStep,
     updateStep,
-    completeOnboarding
+    completeOnboarding,
+    setRunTour,
   } = useOnboarding();
   const reducedMotion = useReducedMotion();
+  const searchParams = useSearchParams();
+
+  // Honour ?tour=1 — used by Replay Tour and post-bot-creation routing
+  useEffect(() => {
+    if (searchParams.get("tour") === "1") {
+      setRunTour(true);
+      // Remove param from URL without navigation
+      const url = new URL(window.location.href);
+      url.searchParams.delete("tour");
+      window.history.replaceState(null, "", url.toString());
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [activeTab, setActiveTab] = useState<Tab>("configuration");
 
@@ -118,9 +133,11 @@ export default function BotManager({ botId }: { botId: string }) {
   }, [docs.length, currentStep, globalRunTour, updateStep]);
 
   const handleJoyrideCallback = useCallback(async (data: any) => {
-    const { action, index, status, type } = data;
+    const { action, index, status, type, size } = data;
+    const isLastStep = index === size - 1;
 
-    if (type === "step:after" && (action === "next" || action === "prev")) {
+    // Only advance/retreat when not on the last step to avoid writing step 11+
+    if (type === "step:after" && !isLastStep && (action === "next" || action === "prev")) {
       const nextIndex = action === "next" ? index + 1 + 2 : index - 1 + 2;
       await updateStep(nextIndex);
     }
@@ -160,7 +177,7 @@ export default function BotManager({ botId }: { botId: string }) {
           setColor(data.color || '#6366f1');
           setWelcomeMsg(data.welcome_msg || 'Hi! How can I help you today?');
         }
-      } catch(e) {}
+      } catch(e) { console.error("Failed to load bot data:", e); }
     }
     loadBotData();
 
@@ -176,7 +193,7 @@ export default function BotManager({ botId }: { botId: string }) {
           setWidgetCode(data.snippet);
           setBotToken(data.bot_token);
         }
-      } catch (e) {}
+      } catch (e) { console.error("Failed to load embed snippet:", e); }
     }
     loadSnippet();
 
@@ -191,7 +208,7 @@ export default function BotManager({ botId }: { botId: string }) {
           const data = await res.json();
           setDocs(data);
         }
-      } catch (e) {}
+      } catch (e) { console.error("Failed to load documents:", e); }
     }
 
     loadDocs();
