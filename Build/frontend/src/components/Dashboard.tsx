@@ -18,8 +18,9 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.search.includes('new=1')) {
-      setShowModal(true);
+      const timer = setTimeout(() => setShowModal(true), 0);
       window.history.replaceState(null, '', window.location.pathname);
+      return () => clearTimeout(timer);
     }
   }, []);
 
@@ -126,7 +127,6 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
 
   return (
     <div className="space-y-8 relative">
-      {/* @ts-ignore - react-joyride v3 typings are strict */}
       <Joyride
         steps={[
           {
@@ -228,7 +228,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
               Welcome to Chatbot Builder! 🎉
             </h2>
             <p className="text-secondary text-[15px] mb-8">
-              It looks like you haven't created any bots yet. Follow these 4 simple steps to build and deploy your first custom AI assistant.
+              It looks like you haven&apos;t created any bots yet. Follow these 4 simple steps to build and deploy your first custom AI assistant.
             </p>
             
             <div className="space-y-6 mb-8">

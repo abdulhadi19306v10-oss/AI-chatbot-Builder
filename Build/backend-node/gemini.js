@@ -3,7 +3,7 @@
 const OpenAI = require('openai');
 
 const client = new OpenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY || 'missing_key',
   baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
 });
 

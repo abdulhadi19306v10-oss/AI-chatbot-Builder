@@ -436,7 +436,7 @@ export default function LandingPage() {
                 </svg>
               </div>
               <h3 className={`text-lg font-bold mb-2 ${isLightMode ? "text-[#14171F]" : "text-gray-100"}`}>Chat History</h3>
-              <p className={`text-sm ${isLightMode ? "text-[#6d7a76]" : "text-gray-400"} leading-relaxed font-light`}>Audit past conversations to identify knowledge gaps and refine your bot's behavior.</p>
+              <p className={`text-sm ${isLightMode ? "text-[#6d7a76]" : "text-gray-400"} leading-relaxed font-light`}>Audit past conversations to identify knowledge gaps and refine your bot&apos;s behavior.</p>
             </div>
 
             {/* Feature 6 */}

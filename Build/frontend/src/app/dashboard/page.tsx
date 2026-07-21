@@ -128,7 +128,7 @@ export default function DashboardPage() {
                 Welcome to Chatbot Builder! 🎉
               </h2>
               <p className="text-secondary text-[15px] mb-8">
-                It looks like you haven't created any bots yet. Follow these 4 simple steps to build and deploy your first custom AI assistant.
+                It looks like you haven&apos;t created any bots yet. Follow these 4 simple steps to build and deploy your first custom AI assistant.
               </p>
               
               <div className="space-y-6 mb-8">

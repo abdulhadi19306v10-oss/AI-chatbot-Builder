@@ -18,6 +18,7 @@ export default function NotificationBell() {
     // ponytail: persist last-seen timestamp in localStorage so unread count survives refresh
     typeof window !== "undefined" ? (localStorage.getItem("notif_last_seen") ?? new Date(0).toISOString()) : new Date(0).toISOString()
   );
+  const [now, setNow] = useState(() => Date.now());
   const panelRef = useRef<HTMLDivElement>(null);
 
   const fetchLeads = useCallback(async () => {
@@ -57,10 +58,24 @@ export default function NotificationBell() {
 
   // Initial fetch + poll every 30s
   useEffect(() => {
-    fetchLeads();
-    const id = setInterval(fetchLeads, 30_000);
-    return () => clearInterval(id);
+    let active = true;
+    Promise.resolve().then(() => {
+      if (active) fetchLeads();
+    });
+    const id = setInterval(() => {
+      if (active) fetchLeads();
+    }, 30_000);
+    return () => {
+      active = false;
+      clearInterval(id);
+    };
   }, [fetchLeads]);
+
+  // Keep 'now' state updated every 30s
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 30_000);
+    return () => clearInterval(id);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -78,14 +93,14 @@ export default function NotificationBell() {
   const handleOpen = () => {
     setOpen((v) => !v);
     if (!open) {
-      const now = new Date().toISOString();
-      setLastSeenAt(now);
-      localStorage.setItem("notif_last_seen", now);
+      const nowStr = new Date().toISOString();
+      setLastSeenAt(nowStr);
+      localStorage.setItem("notif_last_seen", nowStr);
     }
   };
 
   const timeAgo = (iso: string) => {
-    const diff = Date.now() - new Date(iso).getTime();
+    const diff = now - new Date(iso).getTime();
     const mins = Math.floor(diff / 60_000);
     if (mins < 1) return "just now";
     if (mins < 60) return `${mins}m ago`;

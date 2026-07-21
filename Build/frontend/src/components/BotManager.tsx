@@ -17,9 +17,10 @@ export default function BotManager({ botId }: { botId: string }) {
 
   useEffect(() => {
     if (typeof window !== 'undefined' && window.location.search.includes('tour=1')) {
-      setRunTour(true);
+      const timer = setTimeout(() => setRunTour(true), 0);
       // Optional: remove query param after starting tour
       window.history.replaceState(null, '', window.location.pathname);
+      return () => clearTimeout(timer);
     }
   }, []);
   const [iframeKey, setIframeKey] = useState(0);
@@ -74,7 +75,6 @@ export default function BotManager({ botId }: { botId: string }) {
     }
     loadSnippet();
 
-    let interval: NodeJS.Timeout;
     async function loadDocs() {
       const token = await getToken();
       if (!token || token === "test") return;
@@ -90,7 +90,7 @@ export default function BotManager({ botId }: { botId: string }) {
     }
 
     loadDocs();
-    interval = setInterval(loadDocs, 3000);
+    const interval = setInterval(loadDocs, 3000);
     return () => clearInterval(interval);
   }, [botId, session]);
 
@@ -213,7 +213,7 @@ export default function BotManager({ botId }: { botId: string }) {
 
   return (
     <div className="space-y-6 relative">
-      {/* @ts-ignore */}
+
       <Joyride
         steps={[
           {

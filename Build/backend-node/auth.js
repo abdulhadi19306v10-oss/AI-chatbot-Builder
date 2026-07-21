@@ -4,7 +4,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const pool = require('./db');
 
-const SECRET = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET || 'fallback_secret_for_dev';
+const SECRET = process.env.NEXTAUTH_SECRET || process.env.JWT_SECRET;
+if (!SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('FATAL: NEXTAUTH_SECRET or JWT_SECRET must be set in production');
+}
+const ACTUAL_SECRET = SECRET || 'fallback_secret_for_dev';
 const SALT_ROUNDS = 10;
 
 // POST /auth/signup
@@ -55,7 +59,7 @@ async function requireAuth(req, res, next) {
   const token = header.startsWith('Bearer ') ? header.slice(7) : null;
   if (!token) return res.status(401).json({ error: 'Missing token' });
   try {
-    const payload = jwt.verify(token, SECRET);
+    const payload = jwt.verify(token, ACTUAL_SECRET);
     if (!payload.email) return res.status(401).json({ error: 'Invalid token payload' });
     
     // Look up or auto-create user by email to ensure we have the DB integer ID.
