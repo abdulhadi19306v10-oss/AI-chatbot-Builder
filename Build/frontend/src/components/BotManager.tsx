@@ -259,6 +259,14 @@ export default function BotManager({ botId }: { botId: string }) {
   const labelClass = "block text-sm font-bold text-ink mb-1.5";
   const JoyrideComponent = Joyride as any;
 
+  console.log("Onboarding Debug [BotManager]:", {
+    globalRunTour,
+    currentStep,
+    docsCount: docs.length,
+    mounted,
+    shouldRun: globalRunTour && currentStep >= 2 && currentStep <= 10
+  });
+
   return (
     <div className="space-y-6 relative">
 

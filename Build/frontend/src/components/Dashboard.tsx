@@ -152,6 +152,15 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   const activeBots = bots.filter(b => b.status !== "failed");
   const JoyrideComponent = Joyride as any;
 
+  console.log("Onboarding Debug [Dashboard]:", {
+    runTour,
+    currentStep,
+    initialLoadDone,
+    botsCount: bots.length,
+    mounted,
+    shouldRun: runTour && currentStep < 2 && initialLoadDone && bots.length === 0
+  });
+
   return (
     <div className="space-y-8 relative">
       {mounted && (
