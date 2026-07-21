@@ -7,12 +7,9 @@ import { getBackendUrl } from "@/lib/config";
 if (typeof window !== "undefined") {
   const originalError = console.error;
   console.error = (...args: any[]) => {
-    const msg = args[0];
-    if (
-      typeof msg === "string" &&
-      msg.includes("React does not recognize the") &&
-      msg.includes("borderRadius")
-    ) {
+    const isReactWarning = args.some(arg => typeof arg === "string" && arg.includes("React does not recognize"));
+    const isBorderRadius = args.some(arg => typeof arg === "string" && arg.includes("borderRadius"));
+    if (isReactWarning && isBorderRadius) {
       return;
     }
     originalError(...args);
