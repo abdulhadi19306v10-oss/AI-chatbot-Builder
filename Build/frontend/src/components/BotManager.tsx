@@ -50,7 +50,6 @@ export default function BotManager({ botId }: { botId: string }) {
       target: "#tour-kb-upload",
       title: "Upload Knowledge Base",
       content: "Upload FAQ documents, PDF, DOCX or TXT files. Your bot learns from these automatically.",
-      showNextButton: false,
       spotlightRadius: 8,
     },
     {
