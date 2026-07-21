@@ -179,7 +179,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
               showNextButton: false,
             }
           ] as any[]}
-          run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0}
+          run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0 && !showModal}
           stepIndex={currentStep}
           callback={handleJoyrideCallback}
           continuous={true}
