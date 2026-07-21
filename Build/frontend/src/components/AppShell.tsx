@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import anime from "animejs";
 import { signOut } from "next-auth/react";
 import type { ReactNode } from "react";
 import ThemeSwitcher from "./ThemeSwitcher";
+import { useOnboarding } from "@/components/OnboardingProvider";
 
 interface AppShellProps {
   children: ReactNode;
@@ -65,6 +66,8 @@ export default function AppShell({
   botId,
 }: AppShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { replayOnboarding } = useOnboarding();
   const userName = session?.user?.name || session?.user?.email || "User";
   const userEmail = session?.user?.email || "";
   const userInitial = (session?.user?.name?.[0] || session?.user?.email?.[0] || "?").toUpperCase();
@@ -203,6 +206,20 @@ export default function AppShell({
             </svg>
             Create New Bot
           </Link>
+
+          {/* Replay Onboarding Tour */}
+          <button
+            onClick={async () => {
+              await replayOnboarding();
+              router.push("/my-bots");
+            }}
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-secondary hover:bg-paper hover:text-ink transition-colors cursor-pointer"
+          >
+            <svg className="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18" />
+            </svg>
+            Replay Tour
+          </button>
 
           {/* Sign Out */}
           <button

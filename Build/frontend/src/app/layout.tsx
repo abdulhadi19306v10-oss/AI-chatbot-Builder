@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { AuthProviders } from "@/components/AuthProviders";
 import { ThemeProvider } from "next-themes";
+import { OnboardingProvider } from "@/components/OnboardingProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -31,7 +32,9 @@ export default function RootLayout({
       <body className={`${inter.variable} ${spaceGrotesk.variable} antialiased bg-paper text-ink`}>
         <AuthProviders>
           <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem={false}>
-            {children}
+            <OnboardingProvider>
+              {children}
+            </OnboardingProvider>
           </ThemeProvider>
         </AuthProviders>
       </body>

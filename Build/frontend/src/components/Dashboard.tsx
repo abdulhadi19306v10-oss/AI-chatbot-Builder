@@ -5,11 +5,34 @@ import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { Joyride, STATUS } from "react-joyride";
+import { Joyride } from "react-joyride";
+import { useOnboarding } from "@/components/OnboardingProvider";
+import { OnboardingTooltip, joyrideStyles, useReducedMotion } from "@/components/OnboardingTour";
 
 export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id: string; name: string }[]) => void }) {
   const { data: session } = useSession();
   const getToken = async () => (session as any)?.id_token || "test";
+
+  const {
+    runTour,
+    currentStep,
+    updateStep,
+    completeOnboarding
+  } = useOnboarding();
+  const reducedMotion = useReducedMotion();
+
+  const handleJoyrideCallback = async (data: any) => {
+    const { action, index, status, type } = data;
+
+    if (type === "step:after" && (action === "next" || action === "prev")) {
+      const nextIndex = action === "next" ? index + 1 : index - 1;
+      await updateStep(nextIndex);
+    }
+
+    if (status === "skipped" || status === "finished") {
+      await completeOnboarding();
+    }
+  };
   const [bots, setBots] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [botName, setBotName] = useState("");
@@ -90,7 +113,8 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
         });
         setBotName("");
         setShowModal(false);
-        // Navigate to the bot manager with tour flag enabled
+        // Save step 2 (Stage 2) in database and redirect
+        await updateStep(2);
         window.location.href = `/bot/${bot.id}?tour=1`;
       } else {
         const errData = await res.json().catch(() => null);
@@ -124,18 +148,37 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   };
 
   const activeBots = bots.filter(b => b.status !== "failed");
+  const JoyrideComponent = Joyride as any;
 
   return (
     <div className="space-y-8 relative">
-      <Joyride
+      <JoyrideComponent
         steps={[
           {
-            target: '#tour-create-bot-btn',
-            content: 'Welcome! Let\'s start by creating your very first AI assistant.',
+            target: "body",
+            placement: "center",
+            title: "Welcome to Chatbot Builder! 🎉",
+            content: "Let's set up your first custom AI chatbot in a few simple steps.",
+          },
+          {
+            target: "#tour-create-bot-btn",
+            title: "Create Your First Bot",
+            content: "Click this button to name and customize your new assistant.",
+            showNextButton: false,
           }
-        ]}
-        run={initialLoadDone && bots.length === 0 && !showModal}
+        ] as any[]}
+        run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0}
+        stepIndex={currentStep}
+        callback={handleJoyrideCallback}
         continuous={true}
+        tooltipComponent={OnboardingTooltip}
+        styles={joyrideStyles as any}
+        disableOverlayAnimate={reducedMotion}
+        disableScrollParentAnimate={reducedMotion}
+        floaterProps={{
+          disableAnimation: reducedMotion,
+          autoFocus: true,
+        }}
       />
       
       {/* Page header */}

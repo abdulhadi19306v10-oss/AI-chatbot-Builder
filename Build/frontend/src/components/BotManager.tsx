@@ -4,6 +4,8 @@ import { getBackendUrl } from "../lib/config";
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { Joyride } from "react-joyride";
+import { useOnboarding } from "@/components/OnboardingProvider";
+import { OnboardingTooltip, joyrideStyles, useReducedMotion } from "@/components/OnboardingTour";
 
 type Tab = "configuration" | "knowledge" | "deploy";
 
@@ -13,16 +15,58 @@ export default function BotManager({ botId }: { botId: string }) {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [docs, setDocs] = useState<any[]>([]);
-  const [runTour, setRunTour] = useState(false);
 
+  const {
+    runTour: globalRunTour,
+    currentStep,
+    updateStep,
+    completeOnboarding
+  } = useOnboarding();
+  const reducedMotion = useReducedMotion();
+
+  const [activeTab, setActiveTab] = useState<Tab>("configuration");
+
+  // Track active tab matching step
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.location.search.includes('tour=1')) {
-      const timer = setTimeout(() => setRunTour(true), 0);
-      // Optional: remove query param after starting tour
-      window.history.replaceState(null, '', window.location.pathname);
-      return () => clearTimeout(timer);
+    if (!globalRunTour) return;
+    if (currentStep >= 2 && currentStep <= 5) {
+      setActiveTab("configuration");
+    } else if (currentStep === 6 || currentStep === 7) {
+      setActiveTab("knowledge");
+    } else if (currentStep >= 8) {
+      setActiveTab("deploy");
     }
-  }, []);
+  }, [currentStep, globalRunTour]);
+
+  // Auto-advance step 6 to 7 when document is uploaded
+  useEffect(() => {
+    if (globalRunTour && currentStep === 6 && docs.length > 0) {
+      updateStep(7);
+    }
+  }, [docs.length, currentStep, globalRunTour, updateStep]);
+
+  // Skip step 7 if there are no docs
+  useEffect(() => {
+    if (globalRunTour && currentStep === 7) {
+      if (docs.length === 0) {
+        updateStep(8);
+      }
+    }
+  }, [docs.length, currentStep, globalRunTour, updateStep]);
+
+  const handleJoyrideCallback = async (data: any) => {
+    const { action, index, status, type } = data;
+
+    if (type === "step:after" && (action === "next" || action === "prev")) {
+      const nextIndex = action === "next" ? index + 1 + 2 : index - 1 + 2;
+      await updateStep(nextIndex);
+    }
+
+    if (status === "skipped" || status === "finished") {
+      await completeOnboarding();
+    }
+  };
+
   const [iframeKey, setIframeKey] = useState(0);
   const [widgetCode, setWidgetCode] = useState<string>('');
   const [botToken, setBotToken] = useState<string>('');
@@ -36,8 +80,6 @@ export default function BotManager({ botId }: { botId: string }) {
   const [welcomeMsg, setWelcomeMsg] = useState('Hi! How can I help you today?');
   const [savingConfig, setSavingConfig] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  
-  const [activeTab, setActiveTab] = useState<Tab>("configuration");
 
   // Fetch bot data and documents on load
   useEffect(() => {
@@ -210,27 +252,74 @@ export default function BotManager({ botId }: { botId: string }) {
   const inputClass =
     "w-full px-4 py-3 rounded-lg border border-border bg-card text-inkink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm";
   const labelClass = "block text-sm font-bold text-ink mb-1.5";
+  const JoyrideComponent = Joyride as any;
 
   return (
     <div className="space-y-6 relative">
 
-      <Joyride
+      <JoyrideComponent
         steps={[
           {
-            target: '#tour-tab-configuration',
-            content: 'First, customize your bot\'s name, avatar, and welcome message. Don\'t forget to click Save!',
+            target: "#tour-bot-name",
+            title: "Bot Name",
+            content: "Give your bot a name your visitors will recognize.",
           },
           {
-            target: '#tour-tab-knowledge',
-            content: 'Next, upload documents here so your bot can learn about your business.',
+            target: "#tour-bot-appearance",
+            title: "Appearance & Brand",
+            content: "Match your bot's look and style to your brand.",
           },
           {
-            target: '#tour-tab-deploy',
-            content: 'Finally, go here to grab your embed script and deploy the bot to your website!',
+            target: "#tour-bot-welcome",
+            title: "Welcome Message",
+            content: "This is the first message your visitors will see.",
+          },
+          {
+            target: "#tour-bot-save",
+            title: "Save Changes",
+            content: "Save your bot's settings before moving on.",
+          },
+          {
+            target: "#tour-kb-upload",
+            title: "Upload Knowledge Base",
+            content: "Upload FAQ documents, PDF, DOCX or TXT files. Your bot learns from these automatically.",
+            showNextButton: false,
+          },
+          {
+            target: "#tour-kb-status",
+            title: "Training Status",
+            content: "Once this shows 'Ready', your bot can answer questions using the document.",
+            showNextButton: docs.some(d => d.status === "ready"),
+          },
+          {
+            target: "#tour-deploy-copy",
+            title: "Copy Embed Snippet",
+            content: "Copy this script tag and paste it into your website right before the </body> tag.",
+          },
+          {
+            target: "#tour-deploy-preview",
+            title: "Test Your Chatbot",
+            content: "Open the live demo page to test your chatbot interface.",
+          },
+          {
+            target: "body",
+            placement: "center",
+            title: "All Set! 🎉",
+            content: "Your custom chatbot is now ready. Replay this tour anytime from the menu.",
           }
-        ]}
-        run={runTour}
+        ] as any[]}
+        run={globalRunTour && currentStep >= 2 && currentStep <= 10}
+        stepIndex={currentStep - 2}
+        callback={handleJoyrideCallback}
         continuous={true}
+        tooltipComponent={OnboardingTooltip}
+        styles={joyrideStyles as any}
+        disableOverlayAnimate={reducedMotion}
+        disableScrollParentAnimate={reducedMotion}
+        floaterProps={{
+          disableAnimation: reducedMotion,
+          autoFocus: true,
+        }}
       />
       {/* Page heading */}
       <div>
@@ -275,11 +364,12 @@ export default function BotManager({ botId }: { botId: string }) {
               Bot Configuration
             </h2>
             <form onSubmit={handleSaveConfig} className="space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div id="tour-bot-appearance" className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-5">
                   <div>
                     <label className={labelClass}>Bot Name</label>
                     <input
+                      id="tour-bot-name"
                       type="text"
                       value={botName}
                       onChange={e => setBotName(e.target.value)}
@@ -364,6 +454,7 @@ export default function BotManager({ botId }: { botId: string }) {
                 <div className="sm:col-span-2">
                   <label className={labelClass}>Welcome Message</label>
                   <textarea
+                    id="tour-bot-welcome"
                     value={welcomeMsg}
                     onChange={e => setWelcomeMsg(e.target.value)}
                     rows={3}
@@ -373,6 +464,7 @@ export default function BotManager({ botId }: { botId: string }) {
               </div>
               <div className="flex items-center gap-4 pt-1">
                 <button
+                  id="tour-bot-save"
                   type="submit"
                   disabled={savingConfig}
                   className="px-6 py-3 bg-signal-teal hover:bg-teal-dark text-white font-semibold rounded-lg transition-colors disabled:opacity-50 text-sm"
@@ -426,7 +518,7 @@ export default function BotManager({ botId }: { botId: string }) {
           {/* Doc list */}
           {docs.length > 0 && (
             <div className="space-y-2">
-              {docs.map((doc) => (
+              {docs.map((doc, idx) => (
                 <div key={doc.id} className="flex flex-col p-4 border border-border rounded-xl bg-card">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-3">
@@ -439,7 +531,9 @@ export default function BotManager({ botId }: { botId: string }) {
                       <span className="font-medium text-ink text-sm">{doc.filename}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`text-xs px-3 py-1 rounded-full font-semibold ${
+                      <span
+                        id={idx === 0 ? "tour-kb-status" : undefined}
+                        className={`text-xs px-3 py-1 rounded-full font-semibold ${
                         doc.status === 'ready'
                           ? 'bg-card text-ink'
                           : doc.status === 'failed'
@@ -470,6 +564,7 @@ export default function BotManager({ botId }: { botId: string }) {
           {/* Upload zone */}
           <form onSubmit={handleUpload} className="space-y-4">
             <div
+              id="tour-kb-upload"
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={(e) => { e.preventDefault(); setIsDragging(false); }}
               onDrop={(e) => {
@@ -553,7 +648,7 @@ export default function BotManager({ botId }: { botId: string }) {
               tag on your website.
             </p>
 
-            <div className="relative group">
+            <div id="tour-deploy-copy" className="relative group">
               <pre className="bg-[#0a0a0a] text-gray-200 p-5 rounded-xl overflow-x-auto text-sm font-mono leading-relaxed border border-border/10">
                 <code>{widgetCode}</code>
               </pre>
@@ -566,7 +661,7 @@ export default function BotManager({ botId }: { botId: string }) {
             </div>
           </div>
 
-          <div className="bg-card border border-border rounded-xl p-6 shadow-sm flex items-center justify-between gap-4">
+          <div id="tour-deploy-preview" className="bg-card border border-border rounded-xl p-6 shadow-sm flex items-center justify-between gap-4">
             <div>
               <h3
                 className="font-bold text-ink text-base mb-1"

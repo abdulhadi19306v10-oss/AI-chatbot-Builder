@@ -8,11 +8,16 @@ import NotificationBell from "@/components/NotificationBell";
 import AppShell from "@/components/AppShell";
 import { getBackendUrl } from "@/lib/config";
 
+import { useOnboarding } from "@/components/OnboardingProvider";
+
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const isLoaded = status !== "loading";
   const userId = session?.user?.email;
+
+  const { onboardingCompletedAt, onboardingStep, isLoading: onboardingLoading, updateStep } = useOnboarding();
+  const [redirected, setRedirected] = useState(false);
 
   const [summary, setSummary] = useState({ bots: 0, activeBots: 0, conversations: 0, leads: 0 });
   const [loadingSummary, setLoadingSummary] = useState(true);
@@ -22,6 +27,33 @@ export default function DashboardPage() {
       router.push("/login");
     }
   }, [status, router]);
+
+  useEffect(() => {
+    if (onboardingLoading || loadingSummary || redirected || status !== "authenticated") return;
+
+    if (onboardingCompletedAt === null) {
+      setRedirected(true);
+      const token = (session as any)?.id_token;
+      if (!token) return;
+
+      fetch(`${getBackendUrl()}/bots`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(res => res.ok ? res.json() : [])
+      .then(async (botsList) => {
+        if (botsList.length === 0) {
+          router.push("/my-bots");
+        } else {
+          const latestBot = botsList[0];
+          if (onboardingStep < 2) {
+            await updateStep(2);
+          }
+          router.push(`/bot/${latestBot.id}?tour=1`);
+        }
+      })
+      .catch(console.error);
+    }
+  }, [onboardingCompletedAt, onboardingStep, onboardingLoading, loadingSummary, session, status, router, redirected, updateStep]);
 
   useEffect(() => {
     async function loadSummary() {

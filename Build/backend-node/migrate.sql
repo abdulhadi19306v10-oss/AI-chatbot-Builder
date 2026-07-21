@@ -24,11 +24,13 @@ DROP TABLE IF EXISTS plans         CASCADE;
 -- ─── 2. New tables ───────────────────────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS users (
-  id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name         TEXT NOT NULL,
-  email        TEXT NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id                    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name                  TEXT NOT NULL,
+  email                 TEXT NOT NULL UNIQUE,
+  password_hash         TEXT NOT NULL,
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  onboarding_completed_at TIMESTAMPTZ NULL,
+  onboarding_step       INT DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS bots (
@@ -98,3 +100,7 @@ CREATE INDEX IF NOT EXISTS idx_leads_bot        ON leads(bot_id);
 -- IVFFlat index for cosine similarity on chunk embeddings
 -- Build after data is loaded; lists=100 is fine for small corpora.
 CREATE INDEX IF NOT EXISTS idx_chunks_embedding ON chunks USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+
+-- Onboarding migrations for existing users
+ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_completed_at TIMESTAMPTZ NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_step INT DEFAULT 0;

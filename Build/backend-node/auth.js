@@ -78,4 +78,40 @@ async function requireAuth(req, res, next) {
   }
 }
 
+// GET /auth/onboarding — fetch onboarding state
+router.get('/onboarding', requireAuth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      'SELECT onboarding_completed_at, onboarding_step FROM users WHERE id = $1',
+      [req.userId]
+    );
+    if (!rows[0]) return res.status(404).json({ error: 'User not found' });
+    res.json({
+      onboarding_completed_at: rows[0].onboarding_completed_at,
+      onboarding_step: rows[0].onboarding_step
+    });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PUT /auth/onboarding — update onboarding state (set step, complete or reset)
+router.put('/onboarding', requireAuth, async (req, res) => {
+  const { onboarding_completed_at, onboarding_step } = req.body;
+  try {
+    await pool.query(
+      `UPDATE users SET
+         onboarding_completed_at = $1,
+         onboarding_step = COALESCE($2, onboarding_step)
+       WHERE id = $3`,
+      [onboarding_completed_at || null, onboarding_step !== undefined ? onboarding_step : 0, req.userId]
+    );
+    res.json({ success: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = { router, requireAuth };
