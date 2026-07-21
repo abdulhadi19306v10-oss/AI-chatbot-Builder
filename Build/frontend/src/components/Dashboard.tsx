@@ -188,6 +188,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           callback={handleJoyrideCallback}
           continuous={true}
           spotlightClicks={true}
+          disableOverlay={true}
           tooltipComponent={OnboardingTooltip}
           styles={joyrideStyles as any}
           disableOverlayAnimate={reducedMotion}

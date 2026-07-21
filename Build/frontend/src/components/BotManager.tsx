@@ -337,6 +337,7 @@ export default function BotManager({ botId }: { botId: string }) {
           callback={handleJoyrideCallback}
           continuous={true}
           spotlightClicks={true}
+          disableOverlay={true}
           tooltipComponent={OnboardingTooltip}
           styles={joyrideStyles as any}
           disableOverlayAnimate={reducedMotion}
