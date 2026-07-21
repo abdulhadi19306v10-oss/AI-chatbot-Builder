@@ -45,7 +45,7 @@ NEXTAUTH_SECRET="any_random_string"
 NEXTAUTH_URL="http://localhost:3000"
 
 # Database
-DATABASE_URL="postgresql://neondb_owner:npg_7jRxChIm8WBL@ep-twilight-surf-azli3hmh.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require"
+DATABASE_URL="postgresql://username:password@your-neon-host.neon.tech/neondb?sslmode=require"
 ```
 
 ### 4. Run the Application
