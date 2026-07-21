@@ -26,7 +26,7 @@ interface OnboardingContextProps {
   setCurrentStep: (step: number) => void;
   updateStep: (stepIndex: number) => Promise<void>;
   completeOnboarding: () => Promise<void>;
-  replayOnboarding: () => Promise<void>;
+  replayOnboarding: (step?: number) => Promise<void>;
   fetchState: () => Promise<void>;
 }
 
@@ -119,7 +119,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     }
   };
 
-  const replayOnboarding = async () => {
+  const replayOnboarding = async (step = 0) => {
     const token = (session as any)?.id_token;
     if (!token) return;
     try {
@@ -129,12 +129,12 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ onboarding_completed_at: null, onboarding_step: 0 })
+        body: JSON.stringify({ onboarding_completed_at: null, onboarding_step: step })
       });
       if (res.ok) {
         setOnboardingCompletedAt(null);
-        setOnboardingStep(0);
-        setCurrentStep(0);
+        setOnboardingStep(step);
+        setCurrentStep(step);
         setRunTour(true);
       }
     } catch (e) {

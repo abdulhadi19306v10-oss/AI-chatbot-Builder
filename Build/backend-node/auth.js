@@ -98,14 +98,16 @@ router.get('/onboarding', requireAuth, async (req, res) => {
 
 // PUT /auth/onboarding — update onboarding state (set step, complete or reset)
 router.put('/onboarding', requireAuth, async (req, res) => {
+  const hasCompletedAt = Object.prototype.hasOwnProperty.call(req.body, 'onboarding_completed_at');
+  const hasStep = Object.prototype.hasOwnProperty.call(req.body, 'onboarding_step');
   const { onboarding_completed_at, onboarding_step } = req.body;
   try {
     await pool.query(
       `UPDATE users SET
-         onboarding_completed_at = $1,
-         onboarding_step = COALESCE($2, onboarding_step)
-       WHERE id = $3`,
-      [onboarding_completed_at || null, onboarding_step !== undefined ? onboarding_step : 0, req.userId]
+         onboarding_completed_at = CASE WHEN $1 THEN $2 ELSE onboarding_completed_at END,
+         onboarding_step = CASE WHEN $3 THEN $4 ELSE onboarding_step END
+       WHERE id = $5`,
+      [hasCompletedAt, onboarding_completed_at ?? null, hasStep, onboarding_step ?? null, req.userId]
     );
     res.json({ success: true });
   } catch (e) {

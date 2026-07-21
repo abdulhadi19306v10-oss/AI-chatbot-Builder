@@ -29,7 +29,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
       await updateStep(nextIndex);
     }
 
-    if (status === "skipped" || status === "finished") {
+    if (status === "skipped" || status === "finished" || status === "error" || type === "error:target_not_found") {
       await completeOnboarding();
     }
   };
@@ -185,14 +185,14 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           steps={steps as any[]}
           run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0 && !showModal}
           stepIndex={currentStep}
-          callback={handleJoyrideCallback}
+          onEvent={handleJoyrideCallback}
           continuous={true}
           spotlightClicks={true}
           tooltipComponent={OnboardingTooltip}
           styles={joyrideStyles as any}
           disableOverlayAnimate={reducedMotion}
           disableScrollParentAnimate={reducedMotion}
-          floaterProps={{
+          floatingOptions={{
             disableAnimation: reducedMotion,
             autoFocus: true,
           }}

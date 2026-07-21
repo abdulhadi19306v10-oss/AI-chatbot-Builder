@@ -126,7 +126,7 @@ export default function BotManager({ botId }: { botId: string }) {
       await updateStep(nextIndex);
     }
 
-    if (status === "skipped" || status === "finished") {
+    if (status === "skipped" || status === "finished" || status === "error" || type === "error:target_not_found") {
       await completeOnboarding();
     }
   };
@@ -334,14 +334,14 @@ export default function BotManager({ botId }: { botId: string }) {
           steps={steps as any[]}
           run={globalRunTour && currentStep >= 2 && currentStep <= 10}
           stepIndex={currentStep - 2}
-          callback={handleJoyrideCallback}
+          onEvent={handleJoyrideCallback}
           continuous={true}
           spotlightClicks={true}
           tooltipComponent={OnboardingTooltip}
           styles={joyrideStyles as any}
           disableOverlayAnimate={reducedMotion}
           disableScrollParentAnimate={reducedMotion}
-          floaterProps={{
+          floatingOptions={{
             disableAnimation: reducedMotion,
             autoFocus: true,
           }}

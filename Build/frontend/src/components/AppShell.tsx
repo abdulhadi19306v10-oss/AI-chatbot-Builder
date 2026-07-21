@@ -8,6 +8,7 @@ import { signOut } from "next-auth/react";
 import type { ReactNode } from "react";
 import ThemeSwitcher from "./ThemeSwitcher";
 import { useOnboarding } from "@/components/OnboardingProvider";
+import { getBackendUrl } from "@/lib/config";
 
 interface AppShellProps {
   children: ReactNode;
@@ -210,7 +211,25 @@ export default function AppShell({
           {/* Replay Onboarding Tour */}
           <button
             onClick={async () => {
-              await replayOnboarding();
+              const token = (session as any)?.id_token;
+              if (token) {
+                try {
+                  const res = await fetch(`${getBackendUrl()}/bots`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                  });
+                  if (res.ok) {
+                    const botsList = await res.json();
+                    if (botsList.length > 0) {
+                      await replayOnboarding(2);
+                      router.push(`/bot/${botsList[0].id}?tour=1`);
+                      return;
+                    }
+                  }
+                } catch (e) {
+                  console.error(e);
+                }
+              }
+              await replayOnboarding(0);
               router.push("/my-bots");
             }}
             className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-secondary hover:bg-paper hover:text-ink transition-colors cursor-pointer"
