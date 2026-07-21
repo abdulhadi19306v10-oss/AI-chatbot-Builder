@@ -15,6 +15,11 @@ export default function BotManager({ botId }: { botId: string }) {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [docs, setDocs] = useState<any[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const {
     runTour: globalRunTour,
@@ -257,70 +262,72 @@ export default function BotManager({ botId }: { botId: string }) {
   return (
     <div className="space-y-6 relative">
 
-      <JoyrideComponent
-        steps={[
-          {
-            target: "#tour-bot-name",
-            title: "Bot Name",
-            content: "Give your bot a name your visitors will recognize.",
-          },
-          {
-            target: "#tour-bot-appearance",
-            title: "Appearance & Brand",
-            content: "Match your bot's look and style to your brand.",
-          },
-          {
-            target: "#tour-bot-welcome",
-            title: "Welcome Message",
-            content: "This is the first message your visitors will see.",
-          },
-          {
-            target: "#tour-bot-save",
-            title: "Save Changes",
-            content: "Save your bot's settings before moving on.",
-          },
-          {
-            target: "#tour-kb-upload",
-            title: "Upload Knowledge Base",
-            content: "Upload FAQ documents, PDF, DOCX or TXT files. Your bot learns from these automatically.",
-            showNextButton: false,
-          },
-          {
-            target: "#tour-kb-status",
-            title: "Training Status",
-            content: "Once this shows 'Ready', your bot can answer questions using the document.",
-            showNextButton: docs.some(d => d.status === "ready"),
-          },
-          {
-            target: "#tour-deploy-copy",
-            title: "Copy Embed Snippet",
-            content: "Copy this script tag and paste it into your website right before the </body> tag.",
-          },
-          {
-            target: "#tour-deploy-preview",
-            title: "Test Your Chatbot",
-            content: "Open the live demo page to test your chatbot interface.",
-          },
-          {
-            target: "body",
-            placement: "center",
-            title: "All Set! 🎉",
-            content: "Your custom chatbot is now ready. Replay this tour anytime from the menu.",
-          }
-        ] as any[]}
-        run={globalRunTour && currentStep >= 2 && currentStep <= 10}
-        stepIndex={currentStep - 2}
-        callback={handleJoyrideCallback}
-        continuous={true}
-        tooltipComponent={OnboardingTooltip}
-        styles={joyrideStyles as any}
-        disableOverlayAnimate={reducedMotion}
-        disableScrollParentAnimate={reducedMotion}
-        floaterProps={{
-          disableAnimation: reducedMotion,
-          autoFocus: true,
-        }}
-      />
+      {mounted && (
+        <JoyrideComponent
+          steps={[
+            {
+              target: "#tour-bot-name",
+              title: "Bot Name",
+              content: "Give your bot a name your visitors will recognize.",
+            },
+            {
+              target: "#tour-bot-appearance",
+              title: "Appearance & Brand",
+              content: "Match your bot's look and style to your brand.",
+            },
+            {
+              target: "#tour-bot-welcome",
+              title: "Welcome Message",
+              content: "This is the first message your visitors will see.",
+            },
+            {
+              target: "#tour-bot-save",
+              title: "Save Changes",
+              content: "Save your bot's settings before moving on.",
+            },
+            {
+              target: "#tour-kb-upload",
+              title: "Upload Knowledge Base",
+              content: "Upload FAQ documents, PDF, DOCX or TXT files. Your bot learns from these automatically.",
+              showNextButton: false,
+            },
+            {
+              target: "#tour-kb-status",
+              title: "Training Status",
+              content: "Once this shows 'Ready', your bot can answer questions using the document.",
+              showNextButton: docs.some(d => d.status === "ready"),
+            },
+            {
+              target: "#tour-deploy-copy",
+              title: "Copy Embed Snippet",
+              content: "Copy this script tag and paste it into your website right before the </body> tag.",
+            },
+            {
+              target: "#tour-deploy-preview",
+              title: "Test Your Chatbot",
+              content: "Open the live demo page to test your chatbot interface.",
+            },
+            {
+              target: "body",
+              placement: "center",
+              title: "All Set! 🎉",
+              content: "Your custom chatbot is now ready. Replay this tour anytime from the menu.",
+            }
+          ] as any[]}
+          run={globalRunTour && currentStep >= 2 && currentStep <= 10}
+          stepIndex={currentStep - 2}
+          callback={handleJoyrideCallback}
+          continuous={true}
+          tooltipComponent={OnboardingTooltip}
+          styles={joyrideStyles as any}
+          disableOverlayAnimate={reducedMotion}
+          disableScrollParentAnimate={reducedMotion}
+          floaterProps={{
+            disableAnimation: reducedMotion,
+            autoFocus: true,
+          }}
+        />
+      )}
       {/* Page heading */}
       <div>
         <h1

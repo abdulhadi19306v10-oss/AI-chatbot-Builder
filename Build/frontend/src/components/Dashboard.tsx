@@ -38,8 +38,10 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   const [botName, setBotName] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [initialLoadDone, setInitialLoadDone] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     if (typeof window !== 'undefined' && window.location.search.includes('new=1')) {
       const timer = setTimeout(() => setShowModal(true), 0);
       window.history.replaceState(null, '', window.location.pathname);
@@ -152,34 +154,36 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
 
   return (
     <div className="space-y-8 relative">
-      <JoyrideComponent
-        steps={[
-          {
-            target: "body",
-            placement: "center",
-            title: "Welcome to Chatbot Builder! 🎉",
-            content: "Let's set up your first custom AI chatbot in a few simple steps.",
-          },
-          {
-            target: "#tour-create-bot-btn",
-            title: "Create Your First Bot",
-            content: "Click this button to name and customize your new assistant.",
-            showNextButton: false,
-          }
-        ] as any[]}
-        run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0}
-        stepIndex={currentStep}
-        callback={handleJoyrideCallback}
-        continuous={true}
-        tooltipComponent={OnboardingTooltip}
-        styles={joyrideStyles as any}
-        disableOverlayAnimate={reducedMotion}
-        disableScrollParentAnimate={reducedMotion}
-        floaterProps={{
-          disableAnimation: reducedMotion,
-          autoFocus: true,
-        }}
-      />
+      {mounted && (
+        <JoyrideComponent
+          steps={[
+            {
+              target: "body",
+              placement: "center",
+              title: "Welcome to Chatbot Builder! 🎉",
+              content: "Let's set up your first custom AI chatbot in a few simple steps.",
+            },
+            {
+              target: "#tour-create-bot-btn",
+              title: "Create Your First Bot",
+              content: "Click this button to name and customize your new assistant.",
+              showNextButton: false,
+            }
+          ] as any[]}
+          run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0}
+          stepIndex={currentStep}
+          callback={handleJoyrideCallback}
+          continuous={true}
+          tooltipComponent={OnboardingTooltip}
+          styles={joyrideStyles as any}
+          disableOverlayAnimate={reducedMotion}
+          disableScrollParentAnimate={reducedMotion}
+          floaterProps={{
+            disableAnimation: reducedMotion,
+            autoFocus: true,
+          }}
+        />
+      )}
       
       {/* Page header */}
       <div className="flex items-start justify-between">
