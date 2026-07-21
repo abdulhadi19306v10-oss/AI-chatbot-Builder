@@ -94,17 +94,19 @@ export default function BotManager({ botId }: { botId: string }) {
   const reducedMotion = useReducedMotion();
   const searchParams = useSearchParams();
 
-  // Honour ?tour=1 — used by Replay Tour and post-bot-creation routing
+  // Honour ?tour=1 — used by Replay Tour and post-bot-creation routing.
+  // Depend on the param value so this re-fires if the URL changes while
+  // BotManager is already mounted (e.g. user clicks Replay Tour on the same page).
+  const tourParam = searchParams.get("tour");
   useEffect(() => {
-    if (searchParams.get("tour") === "1") {
+    if (tourParam === "1") {
       setRunTour(true);
-      // Remove param from URL without navigation
+      // Remove param from URL without triggering navigation
       const url = new URL(window.location.href);
       url.searchParams.delete("tour");
       window.history.replaceState(null, "", url.toString());
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [tourParam, setRunTour]);
 
   const [activeTab, setActiveTab] = useState<Tab>("configuration");
 
@@ -174,13 +176,15 @@ export default function BotManager({ botId }: { botId: string }) {
         const res = await fetch(`${getBackendUrl()}/bots/${botId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (res.ok) {
-          const data = await res.json();
-          setBotName(data.name || '');
-          setAvatar(data.avatar || '');
-          setColor(data.color || '#6366f1');
-          setWelcomeMsg(data.welcome_msg || 'Hi! How can I help you today?');
+        if (!res.ok) {
+          console.error("Failed to load bot data:", res.status, res.statusText);
+          return;
         }
+        const data = await res.json();
+        setBotName(data.name || '');
+        setAvatar(data.avatar || '');
+        setColor(data.color || '#6366f1');
+        setWelcomeMsg(data.welcome_msg || 'Hi! How can I help you today?');
       } catch(e) { console.error("Failed to load bot data:", e); }
     }
     loadBotData();
@@ -192,11 +196,13 @@ export default function BotManager({ botId }: { botId: string }) {
         const res = await fetch(`${getBackendUrl()}/bots/${botId}/embed-snippet`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (res.ok) {
-          const data = await res.json();
-          setWidgetCode(data.snippet);
-          setBotToken(data.bot_token);
+        if (!res.ok) {
+          console.error("Failed to load embed snippet:", res.status, res.statusText);
+          return;
         }
+        const data = await res.json();
+        setWidgetCode(data.snippet);
+        setBotToken(data.bot_token);
       } catch (e) { console.error("Failed to load embed snippet:", e); }
     }
     loadSnippet();
@@ -208,10 +214,12 @@ export default function BotManager({ botId }: { botId: string }) {
         const res = await fetch(`${getBackendUrl()}/bots/${botId}/documents`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (res.ok) {
-          const data = await res.json();
-          setDocs(data);
+        if (!res.ok) {
+          console.error("Failed to load documents:", res.status, res.statusText);
+          return;
         }
+        const data = await res.json();
+        setDocs(data);
       } catch (e) { console.error("Failed to load documents:", e); }
     }
 
