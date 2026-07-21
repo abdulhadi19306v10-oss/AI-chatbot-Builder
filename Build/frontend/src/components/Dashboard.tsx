@@ -51,7 +51,8 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
     {
       target: "#tour-create-bot-btn",
       title: "Create Your First Bot",
-      content: "Click this button to name and customize your new assistant. Then click Next to continue.",
+      content: "Click this button to name and customize your new assistant.",
+      showNextButton: false,
       spotlightRadius: 8,
     }
   ], []);
