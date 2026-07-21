@@ -23,7 +23,7 @@ export default function NotificationBell() {
 
   const fetchLeads = useCallback(async () => {
     const token = (session as any)?.id_token;
-    if (!token) return;
+    if (!token) return [];
 
     // First fetch bots if we don't have them passed in
     let fetchedBots: { id: string; name: string }[] = [];
@@ -36,7 +36,7 @@ export default function NotificationBell() {
       }
     } catch (e) {}
 
-    if (fetchedBots.length === 0) return;
+    if (fetchedBots.length === 0) return [];
 
     const results = await Promise.allSettled(
       fetchedBots.map(async (bot) => {
@@ -49,22 +49,21 @@ export default function NotificationBell() {
       })
     );
 
-    const all: Lead[] = results
+    return results
       .flatMap((r) => (r.status === "fulfilled" ? r.value : []))
       .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-    setLeads(all);
   }, [session]);
 
   // Initial fetch + poll every 30s
   useEffect(() => {
     let active = true;
-    Promise.resolve().then(() => {
-      if (active) fetchLeads();
-    });
-    const id = setInterval(() => {
-      if (active) fetchLeads();
-    }, 30_000);
+    const run = async () => {
+      const all = await fetchLeads();
+      if (active) setLeads(all);
+    };
+
+    run();
+    const id = setInterval(run, 30_000);
     return () => {
       active = false;
       clearInterval(id);

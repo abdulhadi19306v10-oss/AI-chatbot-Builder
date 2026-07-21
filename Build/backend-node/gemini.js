@@ -2,8 +2,13 @@
 // Using the openai Node SDK as instructed (Gemini's OpenAI-compatible endpoint).
 const OpenAI = require('openai');
 
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error('FATAL: GEMINI_API_KEY must be set');
+}
+
 const client = new OpenAI({
-  apiKey: process.env.GEMINI_API_KEY || 'missing_key',
+  apiKey,
   baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
 });
 
