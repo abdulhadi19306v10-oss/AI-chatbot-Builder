@@ -4,6 +4,11 @@ import { createContext, useContext, useState, useEffect, useCallback } from "rea
 import { useSession } from "next-auth/react";
 import { getBackendUrl } from "@/lib/config";
 
+// TODO: Remove once react-joyride ships a fix for SVG path prop forwarding under React 19.
+// react-joyride's JoyrideOverlay spreads style objects (including `borderRadius`) onto SVG
+// <path> elements. React 19 validates DOM attributes strictly and calls console.error for
+// unrecognised props, which Next.js dev mode intercepts to show a blocking full-screen overlay.
+// Tracking: https://github.com/gilbarbara/react-joyride/issues
 if (typeof window !== "undefined") {
   const originalError = console.error;
   console.error = (...args: any[]) => {

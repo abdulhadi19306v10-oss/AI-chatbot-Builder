@@ -1,7 +1,7 @@
 "use client";
 import { getBackendUrl } from "../lib/config";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import gsap from "gsap";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -21,7 +21,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   } = useOnboarding();
   const reducedMotion = useReducedMotion();
 
-  const handleJoyrideCallback = async (data: any) => {
+  const handleJoyrideCallback = useCallback(async (data: any) => {
     const { action, index, status, type } = data;
 
     if (type === "step:after" && (action === "next" || action === "prev")) {
@@ -32,7 +32,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
     if (status === "skipped" || status === "finished" || status === "error" || type === "error:target_not_found") {
       await completeOnboarding();
     }
-  };
+  }, [updateStep, completeOnboarding]);
   const [bots, setBots] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [botName, setBotName] = useState("");
@@ -51,8 +51,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
     {
       target: "#tour-create-bot-btn",
       title: "Create Your First Bot",
-      content: "Click this button to name and customize your new assistant.",
-      showNextButton: false,
+      content: "Click this button to name and customize your new assistant. Then click Next to continue.",
       spotlightRadius: 8,
     }
   ], []);
@@ -80,6 +79,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           onBotsChange?.(data);
         }
       } catch (e) {
+        console.error("Failed to load bots:", e);
       } finally {
         setInitialLoadDone(true);
       }
@@ -169,14 +169,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   const activeBots = bots.filter(b => b.status !== "failed");
   const JoyrideComponent = Joyride as any;
 
-  console.log("Onboarding Debug [Dashboard]:", {
-    runTour,
-    currentStep,
-    initialLoadDone,
-    botsCount: bots.length,
-    mounted,
-    shouldRun: runTour && currentStep < 2 && initialLoadDone && bots.length === 0
-  });
+
 
   return (
     <div className="space-y-8 relative">
@@ -192,10 +185,6 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           styles={joyrideStyles as any}
           disableOverlayAnimate={reducedMotion}
           disableScrollParentAnimate={reducedMotion}
-          floatingOptions={{
-            disableAnimation: reducedMotion,
-            autoFocus: true,
-          }}
         />
       )}
       
@@ -353,7 +342,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
             >
               Create a new bot
             </h2>
-            <p className="text-error text-sm mb-6">Give your bot a name to get started.</p>
+            <p className="text-secondary text-sm mb-6">Give your bot a name to get started.</p>
 
             <form onSubmit={handleCreateBot} className="space-y-4">
               <div>

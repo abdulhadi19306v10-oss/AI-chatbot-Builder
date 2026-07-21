@@ -104,8 +104,8 @@ router.put('/onboarding', requireAuth, async (req, res) => {
   try {
     await pool.query(
       `UPDATE users SET
-         onboarding_completed_at = CASE WHEN $1 THEN $2 ELSE onboarding_completed_at END,
-         onboarding_step = CASE WHEN $3 THEN $4 ELSE onboarding_step END
+         onboarding_completed_at = CASE WHEN $1::boolean THEN $2 ELSE onboarding_completed_at END,
+         onboarding_step = CASE WHEN $3::boolean THEN $4::int ELSE onboarding_step END
        WHERE id = $5`,
       [hasCompletedAt, onboarding_completed_at ?? null, hasStep, onboarding_step ?? null, req.userId]
     );

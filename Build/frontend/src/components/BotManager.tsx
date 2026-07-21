@@ -1,7 +1,7 @@
 "use client";
 import { getBackendUrl } from "../lib/config";
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { Joyride } from "react-joyride";
 import { useOnboarding } from "@/components/OnboardingProvider";
@@ -77,7 +77,7 @@ export default function BotManager({ botId }: { botId: string }) {
       title: "All Set! 🎉",
       content: "Your custom chatbot is now ready. Replay this tour anytime from the menu.",
     }
-  ], [docs]);
+  ], [docs.length > 0 && docs.some((d: any) => d.status === "ready")]);
 
   const {
     runTour: globalRunTour,
@@ -117,7 +117,7 @@ export default function BotManager({ botId }: { botId: string }) {
     }
   }, [docs.length, currentStep, globalRunTour, updateStep]);
 
-  const handleJoyrideCallback = async (data: any) => {
+  const handleJoyrideCallback = useCallback(async (data: any) => {
     const { action, index, status, type } = data;
 
     if (type === "step:after" && (action === "next" || action === "prev")) {
@@ -128,7 +128,7 @@ export default function BotManager({ botId }: { botId: string }) {
     if (status === "skipped" || status === "finished" || status === "error" || type === "error:target_not_found") {
       await completeOnboarding();
     }
-  };
+  }, [updateStep, completeOnboarding]);
 
   const [iframeKey, setIframeKey] = useState(0);
   const [widgetCode, setWidgetCode] = useState<string>('');
@@ -317,13 +317,7 @@ export default function BotManager({ botId }: { botId: string }) {
   const labelClass = "block text-sm font-bold text-ink mb-1.5";
   const JoyrideComponent = Joyride as any;
 
-  console.log("Onboarding Debug [BotManager]:", {
-    globalRunTour,
-    currentStep,
-    docsCount: docs.length,
-    mounted,
-    shouldRun: globalRunTour && currentStep >= 2 && currentStep <= 10
-  });
+
 
   return (
     <div className="space-y-6 relative">
@@ -340,10 +334,6 @@ export default function BotManager({ botId }: { botId: string }) {
           styles={joyrideStyles as any}
           disableOverlayAnimate={reducedMotion}
           disableScrollParentAnimate={reducedMotion}
-          floatingOptions={{
-            disableAnimation: reducedMotion,
-            autoFocus: true,
-          }}
         />
       )}
       {/* Page heading */}
