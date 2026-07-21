@@ -681,7 +681,7 @@ export default function BotManager({ botId }: { botId: string }) {
             </p>
 
             <div id="tour-deploy-copy" className="relative group">
-              <pre className="bg-[#0a0a0a] text-gray-200 p-5 rounded-xl overflow-x-auto text-sm font-mono leading-relaxed border border-border/10">
+              <pre className="bg-[#0a0a0a] text-gray-200 p-5 rounded-xl text-sm font-mono leading-relaxed border border-border/10 whitespace-pre-wrap break-all">
                 <code>{widgetCode}</code>
               </pre>
               <button
