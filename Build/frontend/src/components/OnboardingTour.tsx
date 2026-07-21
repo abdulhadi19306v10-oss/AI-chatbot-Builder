@@ -71,9 +71,6 @@ export const joyrideStyles = {
   options: {
     overlayColor: "rgba(20, 23, 31, 0.5)", // Ink at 50% opacity
     zIndex: 10000,
-  },
-  spotlight: {
-    borderRadius: "12px",
   }
 };
 
