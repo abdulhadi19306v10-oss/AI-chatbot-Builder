@@ -326,6 +326,7 @@ export default function BotManager({ botId }: { botId: string }) {
           stepIndex={currentStep - 2}
           callback={handleJoyrideCallback}
           continuous={true}
+          spotlightClicks={true}
           tooltipComponent={OnboardingTooltip}
           styles={joyrideStyles as any}
           disableOverlayAnimate={reducedMotion}

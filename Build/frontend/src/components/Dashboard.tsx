@@ -183,6 +183,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
           stepIndex={currentStep}
           callback={handleJoyrideCallback}
           continuous={true}
+          spotlightClicks={true}
           tooltipComponent={OnboardingTooltip}
           styles={joyrideStyles as any}
           disableOverlayAnimate={reducedMotion}
