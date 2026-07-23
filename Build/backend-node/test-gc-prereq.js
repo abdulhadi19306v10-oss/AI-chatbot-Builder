@@ -1,16 +1,30 @@
 // test-gc-prereq.js — Verify GC prerequisites manually
 require('dotenv').config();
+const { URL } = require('url');
 const pool = require('./db');
 const { pruneOldConversations } = require('./gc');
 
 const dbUrl = process.env.DATABASE_URL || '';
-const isTestDb = dbUrl.includes('test') || dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1');
 const optIn = process.env.I_AM_SURE_I_WANT_TO_RUN_THIS_TEST === 'true';
+
+let isTestDb = false;
+try {
+  const parsed = new URL(dbUrl);
+  const hostname = parsed.hostname;
+  const dbname = parsed.pathname ? parsed.pathname.replace(/^\//, '').split('?')[0] : '';
+  
+  const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+  const isTestDbName = dbname === 'test' || dbname.startsWith('test_') || dbname.endsWith('_test');
+  
+  isTestDb = isLocalHost || isTestDbName;
+} catch (err) {
+  isTestDb = false;
+}
 
 if (!isTestDb && !optIn) {
   console.error('❌ Error: Do not run this script against a production database.');
   console.error('This script executes pruneOldConversations() which deletes all conversations older than the retention window.');
-  console.error('To run this test, use a database DSN containing "test", "localhost", or set I_AM_SURE_I_WANT_TO_RUN_THIS_TEST=true.');
+  console.error('To run this test, use a local database (localhost/127.0.0.1), a database name ending/starting with "test", or set I_AM_SURE_I_WANT_TO_RUN_THIS_TEST=true.');
   process.exit(1);
 }
 
@@ -110,6 +124,7 @@ async function runTest() {
         await pool.query('DELETE FROM leads WHERE id = $1', [leadId]);
         console.log('Cleanup complete.');
       } catch (cleanupErr) {
+        testFailed = true;
         console.error('Failed to cleanup test lead:', cleanupErr.message);
       }
     }
