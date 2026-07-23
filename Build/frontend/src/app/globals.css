@@ -78,3 +78,16 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
 }
+
+/* ── Disable React Joyride Overlay Backdrop ── */
+.react-joyride__overlay,
+div.react-joyride__overlay,
+#react-joyride-portal svg,
+#react-joyride-portal path,
+#react-joyride-portal polygon {
+  display: none !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
