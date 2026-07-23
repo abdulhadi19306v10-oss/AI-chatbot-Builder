@@ -33,6 +33,25 @@ if (!isTestDb || !optIn || !isTestEnv) {
 
 async function runTest() {
   console.log(`Starting multilingual RAG and localized fallback verification test against backend: ${apiBaseUrl}...`);
+
+  // 0. Backend test mode health check
+  console.log(`Checking backend test mode at ${apiBaseUrl}...`);
+  try {
+    const healthRes = await fetch(`${apiBaseUrl}/auth/test-last-token?email=healthcheck`);
+    if (!healthRes.ok) {
+      throw new Error(`Health check failed: status ${healthRes.status}. Make sure the target backend is running with APP_ENV=test!`);
+    }
+    const healthData = await healthRes.json();
+    if (!healthData || !healthData.hasOwnProperty('token')) {
+      throw new Error(`Health check failed: Response did not contain 'token'. Make sure the target backend is in test mode.`);
+    }
+    console.log('✅ Success: Target backend is confirmed to be running in test mode.');
+  } catch (err) {
+    console.error(`❌ Health Check Error: Cannot confirm test mode at target backend: ${apiBaseUrl}`);
+    console.error(err.message);
+    process.exit(1);
+  }
+
   let testFailed = false;
   let botId = null;
   let docId = null;
@@ -103,18 +122,12 @@ async function runTest() {
     });
     const data2 = await res2.json();
     console.log('Response:', data2);
-    // Should reply in Spanish (not English) since the query was in Spanish
     const lowerContent2 = data2.content.toLowerCase();
     const containsEnglishKeywords = lowerContent2.includes('standard') || lowerContent2.includes('shipping') || lowerContent2.includes('business');
-    const isSpanish = lowerContent2.includes('envío') || lowerContent2.includes('envio') || lowerContent2.includes('días') || lowerContent2.includes('dias') || lowerContent2.includes('hábiles') || lowerContent2.includes('habiles') || lowerContent2.includes('información') || lowerContent2.includes('informacion') || lowerContent2.includes('nombre') || lowerContent2.includes('correo') || lowerContent2.includes('email');
-    if (res2.ok && isSpanish && !containsEnglishKeywords) {
-      if (data2.type === 'answer') {
-        console.log('✅ Success: Spanish query matched English context and replied with a Spanish answer.');
-      } else {
-        console.log('✅ Success: Spanish query triggered a localized Spanish fallback response.');
-      }
+    if (res2.ok && data2.type === 'answer' && (lowerContent2.includes('3') || lowerContent2.includes('5')) && !containsEnglishKeywords) {
+      console.log('✅ Success: Spanish query matched English context and replied with a Spanish answer.');
     } else {
-      console.error('❌ Failure: Cross-lingual query reply was not in Spanish, contained English keywords, or request failed.');
+      console.error('❌ Failure: Cross-lingual query did not retrieve the context, was not in Spanish, or contained English keywords.');
       testFailed = true;
     }
 

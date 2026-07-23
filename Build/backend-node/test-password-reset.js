@@ -36,6 +36,25 @@ if (!isTestDb || !optIn || !isTestEnv) {
 
 async function runTest() {
   console.log(`Starting password reset verification test against backend: ${apiBaseUrl}...`);
+
+  // 0. Backend test mode health check
+  console.log(`Checking backend test mode at ${apiBaseUrl}...`);
+  try {
+    const healthRes = await fetch(`${apiBaseUrl}/auth/test-last-token?email=healthcheck`);
+    if (!healthRes.ok) {
+      throw new Error(`Health check failed: status ${healthRes.status}. Make sure the target backend is running with APP_ENV=test!`);
+    }
+    const healthData = await healthRes.json();
+    if (!healthData || !healthData.hasOwnProperty('token')) {
+      throw new Error(`Health check failed: Response did not contain 'token'. Make sure the target backend is in test mode.`);
+    }
+    console.log('✅ Success: Target backend is confirmed to be running in test mode.');
+  } catch (err) {
+    console.error(`❌ Health Check Error: Cannot confirm test mode at target backend: ${apiBaseUrl}`);
+    console.error(err.message);
+    process.exit(1);
+  }
+
   let testFailed = false;
   let testUserId = null;
   const testEmail = 'reset-test@example.com';
