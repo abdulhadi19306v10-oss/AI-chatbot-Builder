@@ -37,7 +37,11 @@ async function cleanupFailedDocuments() {
 
 async function pruneOldConversations() {
   try {
-    const days = parseInt(process.env.CONVERSATION_RETENTION_DAYS, 10) || 90;
+    const configuredDays = process.env.CONVERSATION_RETENTION_DAYS;
+    const days = configuredDays === undefined ? 90 : Number(configuredDays);
+    if (!Number.isSafeInteger(days) || days < 1) {
+      throw new Error('CONVERSATION_RETENTION_DAYS must be a positive integer');
+    }
     const res = await pool.query(
       `DELETE FROM conversations WHERE started_at < NOW() - ($1 * INTERVAL '1 day')`,
       [days]

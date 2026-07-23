@@ -3,8 +3,22 @@ require('dotenv').config();
 const pool = require('./db');
 const { pruneOldConversations } = require('./gc');
 
+const dbUrl = process.env.DATABASE_URL || '';
+const isTestDb = dbUrl.includes('test') || dbUrl.includes('localhost') || dbUrl.includes('127.0.0.1');
+const optIn = process.env.I_AM_SURE_I_WANT_TO_RUN_THIS_TEST === 'true';
+
+if (!isTestDb && !optIn) {
+  console.error('❌ Error: Do not run this script against a production database.');
+  console.error('This script executes pruneOldConversations() which deletes all conversations older than the retention window.');
+  console.error('To run this test, use a database DSN containing "test", "localhost", or set I_AM_SURE_I_WANT_TO_RUN_THIS_TEST=true.');
+  process.exit(1);
+}
+
 async function runTest() {
   console.log('Starting verification test...');
+  let leadId = null;
+  let testFailed = false;
+
   try {
     // 1. Get or create a bot
     const botRes = await pool.query('SELECT id FROM bots LIMIT 1');
@@ -49,7 +63,7 @@ async function runTest() {
        RETURNING id`,
       [botId, conversationId]
     );
-    const leadId = leadRes.rows[0].id;
+    leadId = leadRes.rows[0].id;
     console.log(`Created lead ID: ${leadId} referencing conversation`);
 
     // 4. Set retention to 90 days and trigger conversation pruning
@@ -63,34 +77,48 @@ async function runTest() {
       console.log('✅ Conversation successfully pruned.');
     } else {
       console.error('❌ Conversation was NOT pruned!');
+      testFailed = true;
     }
 
     // 6. Verify lead survived and conversation_id is NULL, and message is preserved
     const leadCheck = await pool.query('SELECT * FROM leads WHERE id = $1', [leadId]);
     if (leadCheck.rows.length === 0) {
       console.error('❌ Lead was deleted!');
+      testFailed = true;
     } else {
       const lead = leadCheck.rows[0];
       if (lead.conversation_id === null) {
         console.log('✅ Lead conversation_id was set to NULL (ON DELETE SET NULL works).');
       } else {
         console.error(`❌ Lead conversation_id is still ${lead.conversation_id}!`);
+        testFailed = true;
       }
       if (lead.message === 'How do I install this?') {
         console.log(`✅ Lead message was preserved: "${lead.message}".`);
       } else {
         console.error(`❌ Lead message mismatch: "${lead.message}"`);
+        testFailed = true;
       }
     }
 
-    // Cleanup the lead
-    await pool.query('DELETE FROM leads WHERE id = $1', [leadId]);
-    console.log('Cleanup complete.');
-
   } catch (e) {
     console.error('Test failed with error:', e);
+    testFailed = true;
   } finally {
+    if (leadId) {
+      try {
+        await pool.query('DELETE FROM leads WHERE id = $1', [leadId]);
+        console.log('Cleanup complete.');
+      } catch (cleanupErr) {
+        console.error('Failed to cleanup test lead:', cleanupErr.message);
+      }
+    }
     await pool.end();
+    if (testFailed) {
+      process.exit(1);
+    } else {
+      console.log('Verification completed successfully.');
+    }
   }
 }
 
