@@ -170,6 +170,10 @@ router.post('/reset-password', async (req, res) => {
     return res.status(400).json({ error: "Token and new password are required" });
   }
 
+  if (new_password.length < 8) {
+    return res.status(400).json({ error: "Password must be at least 8 characters long" });
+  }
+
   try {
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
     
@@ -188,14 +192,22 @@ router.post('/reset-password', async (req, res) => {
     const hash = await bcrypt.hash(new_password, SALT_ROUNDS);
 
     // Update user's password and invalidate all outstanding tokens for this user in a transaction
-    await pool.query('BEGIN');
-    await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, reset.user_id]);
-    await pool.query('UPDATE password_resets SET used = true WHERE user_id = $1 AND used = false', [reset.user_id]);
-    await pool.query('COMMIT');
+    // ponytail: check out a single client connection from the pool to guarantee atomicity of the transaction
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, reset.user_id]);
+      await client.query('UPDATE password_resets SET used = true WHERE user_id = $1 AND used = false', [reset.user_id]);
+      await client.query('COMMIT');
+    } catch (txError) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw txError;
+    } finally {
+      client.release();
+    }
 
     res.json({ success: true, message: "Password reset successful." });
   } catch (e) {
-    await pool.query('ROLLBACK').catch(() => {});
     console.error('[auth] reset-password error:', e);
     res.status(500).json({ error: "Server error" });
   }

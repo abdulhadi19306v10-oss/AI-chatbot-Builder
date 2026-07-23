@@ -95,6 +95,22 @@ async function runTest() {
     );
     console.log(`Generated custom raw test token: ${rawToken}`);
 
+    // 3.5. Confirm a short password is server-side rejected
+    console.log('Calling POST /auth/reset-password with a short password...');
+    const shortPasswordRes = await fetch('http://localhost:8000/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: rawToken, new_password: 'short' })
+    });
+    const shortPasswordData = await shortPasswordRes.json();
+    console.log('Short password response:', shortPasswordData);
+    if (!shortPasswordRes.ok && shortPasswordData.error === 'Password must be at least 8 characters long') {
+      console.log('✅ Success: Short password correctly rejected by server.');
+    } else {
+      console.error('❌ Error: Short password was NOT rejected properly!');
+      testFailed = true;
+    }
+
     // 4. Use the custom raw token to reset the password
     console.log('Calling POST /auth/reset-password...');
     const resetRes2 = await fetch('http://localhost:8000/auth/reset-password', {
