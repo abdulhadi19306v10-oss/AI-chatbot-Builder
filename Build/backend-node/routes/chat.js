@@ -23,6 +23,18 @@ const SIMILARITY_THRESHOLD = 0.30;
 const TOP_K = 5;
 const FALLBACK_MSG = "I don't have enough information to answer that. Please leave your details and we'll get back to you.";
 
+async function localizedFallback(visitorMessage) {
+  const prompt = `The following message is from a website visitor: "${visitorMessage}"
+Reply with ONLY a short, friendly message (max 2 sentences) in the same language as that message, telling them you don't have enough information to answer their question and asking for their name and email so someone can follow up. Do not include any explanation, just the message itself.`;
+  try {
+    const localized = await geminiChat([{ role: 'user', content: prompt }]);
+    return localized.trim();
+  } catch (e) {
+    console.error('[fallback localization]', e);
+    return FALLBACK_MSG; // fall back to the English default if the localization call itself fails
+  }
+}
+
 router.post('/:bot_token/message', async (req, res) => {
   const { session_id, message } = req.body;
   if (!session_id || !message) return res.status(400).json({ error: 'session_id and message required' });
@@ -77,17 +89,24 @@ router.post('/:bot_token/message', async (req, res) => {
 
     // 3. Zero chunks above threshold → skip LLM, go straight to fallback
     if (chunks.length === 0) {
+      const fallbackContent = await localizedFallback(message);
       await pool.query(
         'INSERT INTO messages (conversation_id, role, content) VALUES ($1,$2,$3)',
-        [conv.id, 'bot', FALLBACK_MSG]
+        [conv.id, 'bot', fallbackContent]
       );
       await pool.query('UPDATE conversations SET resolved=false WHERE id=$1', [conv.id]);
-      return res.json({ type: 'fallback', content: FALLBACK_MSG });
+      return res.json({ type: 'fallback', content: fallbackContent });
     }
 
     // 4. Build context and call LLM
     const context = chunks.map(c => c.content).join('\n\n');
-    const systemPrompt = `You are a helpful assistant. Answer the user's question using ONLY the provided context below.\nIf the context does not contain the answer, reply with the exact string NO_MATCH and nothing else.\nIMPORTANT: Do not mention the context in your reply. Just give a direct answer in a natural, complete sentence.\n\nCONTEXT:\n${context}`;
+    const systemPrompt = `You are a helpful assistant. Answer the user's question using ONLY the provided context below.
+Always reply in the same language the visitor's question was asked in, regardless of what language the context is written in.
+If the context does not contain the answer, reply with the exact string NO_MATCH and nothing else.
+IMPORTANT: Do not mention the context in your reply. Just give a direct answer in a natural, complete sentence.
+
+CONTEXT:
+${context}`;
 
     const reply = await geminiChat([
       { role: 'system', content: systemPrompt },
@@ -96,11 +115,12 @@ router.post('/:bot_token/message', async (req, res) => {
 
     // 5. Confidence check — exact string match
     if (reply.trim() === 'NO_MATCH') {
+      const fallbackContent = await localizedFallback(message);
       await pool.query(
         'INSERT INTO messages (conversation_id, role, content) VALUES ($1,$2,$3)',
-        [conv.id, 'bot', FALLBACK_MSG]
+        [conv.id, 'bot', fallbackContent]
       );
-      return res.json({ type: 'fallback', content: FALLBACK_MSG });
+      return res.json({ type: 'fallback', content: fallbackContent });
     }
 
     await pool.query(
