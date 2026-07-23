@@ -174,10 +174,10 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
 
   return (
     <div className="space-y-8 relative">
-      {mounted && (
+      {mounted && runTour && currentStep < 2 && initialLoadDone && bots.length === 0 && !showModal && (
         <JoyrideComponent
           steps={steps as any[]}
-          run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0 && !showModal}
+          run={true}
           stepIndex={currentStep}
           onEvent={handleJoyrideCallback}
           continuous={true}
