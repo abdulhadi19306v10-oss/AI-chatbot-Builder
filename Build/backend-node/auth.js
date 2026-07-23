@@ -116,4 +116,125 @@ router.put('/onboarding', requireAuth, async (req, res) => {
   }
 });
 
+const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
+
+// Rate limiter for forgot-password: max 5 requests per hour per IP
+// ponytail: minimalist rate limiter
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "If that email is registered, a reset link has been sent." },
+});
+
+// POST /auth/forgot-password
+// ponytail: memory map to store test tokens scoped to emails to prevent cross-test race conditions
+const testTokens = {};
+
+router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
+  const { email } = req.body;
+  const genericResponse = { message: "If that email is registered, a reset link has been sent." };
+  
+  if (!email) return res.json(genericResponse);
+
+  try {
+    const { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [email.trim().toLowerCase()]);
+    const user = rows[0];
+
+    if (user) {
+      const token = crypto.randomBytes(32).toString('hex');
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+      
+      await pool.query(
+        "INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES ($1, $2, NOW() + INTERVAL '1 hour')",
+        [user.id, tokenHash]
+      );
+
+      // Store in test hook if test environment
+      if (process.env.APP_ENV === 'test') {
+        testTokens[email.trim().toLowerCase()] = token;
+      }
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[auth] Reset link: ${frontendUrl}/reset-password?token=${token}`);
+      } else {
+        console.log(`[auth] Reset link generated for user: ${email.trim().toLowerCase()} (token redacted in production)`);
+      }
+    }
+
+    res.json(genericResponse);
+  } catch (e) {
+    console.error('[auth] forgot-password error:', e);
+    // ponytail: return same generic response on error to avoid email leakage
+    res.json(genericResponse);
+  }
+});
+
+// POST /auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  const { token, new_password } = req.body;
+  const genericError = "This reset link is invalid or has expired.";
+
+  if (!token || !new_password) {
+    return res.status(400).json({ error: "Token and new password are required" });
+  }
+
+  if (new_password.length < 8) {
+    return res.status(400).json({ error: "Password must be at least 8 characters long" });
+  }
+
+  try {
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    
+    // Hash the new password before checking connection out of pool (save CPU work on connected client)
+    const hash = await bcrypt.hash(new_password, SALT_ROUNDS);
+
+    // Update user's password and invalidate all outstanding tokens for this user in a transaction
+    // ponytail: check out a single client connection from the pool to guarantee atomicity of the transaction
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+      
+      // Claim the token atomically inside the transaction to prevent replay race conditions
+      const { rows } = await client.query(
+        `UPDATE password_resets SET used = true
+         WHERE token_hash = $1 AND used = false AND expires_at > NOW()
+         RETURNING id, user_id`,
+        [tokenHash]
+      );
+      const reset = rows[0];
+
+      if (!reset) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ error: genericError });
+      }
+
+      await client.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, reset.user_id]);
+      await client.query('UPDATE password_resets SET used = true WHERE user_id = $1 AND used = false', [reset.user_id]);
+      await client.query('COMMIT');
+    } catch (txError) {
+      await client.query('ROLLBACK').catch(() => {});
+      throw txError;
+    } finally {
+      client.release();
+    }
+
+    res.json({ success: true, message: "Password reset successful." });
+  } catch (e) {
+    console.error('[auth] reset-password error:', e);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+// Test endpoint to fetch the last generated test token in test environment
+if (process.env.APP_ENV === 'test') {
+  router.get('/test-last-token', (req, res) => {
+    const email = (req.query.email || '').trim().toLowerCase();
+    res.json({ token: testTokens[email] || null });
+  });
+}
+
 module.exports = { router, requireAuth };
