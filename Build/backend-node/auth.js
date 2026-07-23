@@ -116,4 +116,89 @@ router.put('/onboarding', requireAuth, async (req, res) => {
   }
 });
 
+const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
+
+// Rate limiter for forgot-password: max 5 requests per hour per IP
+// ponytail: minimalist rate limiter
+const forgotPasswordLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: "If that email is registered, a reset link has been sent." },
+});
+
+// POST /auth/forgot-password
+router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
+  const { email } = req.body;
+  const genericResponse = { message: "If that email is registered, a reset link has been sent." };
+  
+  if (!email) return res.json(genericResponse);
+
+  try {
+    const { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [email.trim().toLowerCase()]);
+    const user = rows[0];
+
+    if (user) {
+      const token = crypto.randomBytes(32).toString('hex');
+      const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+      
+      await pool.query(
+        "INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES ($1, $2, NOW() + INTERVAL '1 hour')",
+        [user.id, tokenHash]
+      );
+
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+      console.log(`[auth] Reset link: ${frontendUrl}/reset-password?token=${token}`);
+    }
+
+    res.json(genericResponse);
+  } catch (e) {
+    console.error('[auth] forgot-password error:', e);
+    // ponytail: return same generic response on error to avoid email leakage
+    res.json(genericResponse);
+  }
+});
+
+// POST /auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  const { token, new_password } = req.body;
+  const genericError = "This reset link is invalid or has expired.";
+
+  if (!token || !new_password) {
+    return res.status(400).json({ error: "Token and new password are required" });
+  }
+
+  try {
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    
+    // Look up valid active reset token
+    const { rows } = await pool.query(
+      'SELECT id, user_id FROM password_resets WHERE token_hash = $1 AND used = false AND expires_at > NOW()',
+      [tokenHash]
+    );
+    const reset = rows[0];
+
+    if (!reset) {
+      return res.status(400).json({ error: genericError });
+    }
+
+    // Hash the new password
+    const hash = await bcrypt.hash(new_password, SALT_ROUNDS);
+
+    // Update user's password and invalidate all outstanding tokens for this user in a transaction
+    await pool.query('BEGIN');
+    await pool.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, reset.user_id]);
+    await pool.query('UPDATE password_resets SET used = true WHERE user_id = $1 AND used = false', [reset.user_id]);
+    await pool.query('COMMIT');
+
+    res.json({ success: true, message: "Password reset successful." });
+  } catch (e) {
+    await pool.query('ROLLBACK').catch(() => {});
+    console.error('[auth] reset-password error:', e);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
 module.exports = { router, requireAuth };

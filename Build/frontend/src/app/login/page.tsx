@@ -1,17 +1,19 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isResetSuccess = searchParams.get("reset") === "success";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,8 +74,14 @@ export default function LoginPage() {
             <p className="text-secondary text-[15px]">Manage your business AI helpers</p>
           </div>
 
+          {isResetSuccess && (
+            <div className="mb-6 px-4 py-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 text-signal-teal text-sm rounded-lg font-medium">
+              Password reset successful. Please log in with your new password.
+            </div>
+          )}
+
           {error && (
-            <div className="mb-6 px-4 py-3 bg-red-50 border border-red-100 text-error text-sm rounded-lg">
+            <div className="mb-6 px-4 py-3 bg-red-50 dark:bg-red-950/30 border border-red-100 dark:border-red-900/50 text-error text-sm rounded-lg">
               {error}
             </div>
           )}
@@ -89,23 +97,28 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-border bg-card text-inkink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm"
+                className="w-full px-4 py-3 rounded-lg border border-border bg-card text-ink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm"
                 placeholder="you@example.com"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-[11px] font-semibold uppercase tracking-wider text-secondary mb-1.5">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-[11px] font-semibold uppercase tracking-wider text-secondary">
+                  Password
+                </label>
+                <Link href="/forgot-password" className="text-[11px] font-semibold text-signal-teal hover:text-teal-dark transition">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-11 rounded-lg border border-border bg-card text-inkink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm"
+                  className="w-full px-4 py-3 pr-11 rounded-lg border border-border bg-card text-ink placeholder:text-secondary focus:outline-none focus:ring-2 focus:ring-signal-teal focus:border-signal-teal transition text-sm"
                   placeholder="••••••••"
                 />
                 <button
@@ -116,7 +129,7 @@ export default function LoginPage() {
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
-                    <svg className="w-4.5 h-4.5 w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                     </svg>
                   ) : (
@@ -144,7 +157,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-border" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-card text-inksecondary font-medium">OR</span>
+              <span className="px-3 bg-card text-secondary font-medium">OR</span>
             </div>
           </div>
 
@@ -172,5 +185,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-transparent flex items-center justify-center text-secondary">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
