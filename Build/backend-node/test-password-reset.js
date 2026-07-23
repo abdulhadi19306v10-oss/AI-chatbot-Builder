@@ -15,10 +15,12 @@ try {
   const hostname = parsed.hostname;
   const dbname = parsed.pathname ? parsed.pathname.replace(/^\//, '').split('?')[0] : '';
   
-  const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
-  const isTestDbName = dbname === 'test' || dbname.startsWith('test_') || dbname.endsWith('_test');
+  // ponytail: explicit allowlist of hosts safe for testing to prevent accidental production runs
+  const allowedHostnames = ['localhost', '127.0.0.1', 'ep-twilight-surf-azli3hmh.c-3.ap-southeast-1.aws.neon.tech'];
+  const isAllowedHost = allowedHostnames.includes(hostname);
+  const isTestDbName = dbname === 'test' || dbname.startsWith('test_') || dbname.endsWith('_test') || dbname === 'neondb_test';
   
-  isTestDb = isLocalHost || isTestDbName;
+  isTestDb = isAllowedHost && isTestDbName;
 } catch (err) {
   isTestDb = false;
 }
