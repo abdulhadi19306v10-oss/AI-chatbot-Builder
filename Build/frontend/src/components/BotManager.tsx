@@ -148,7 +148,14 @@ export default function BotManager({ botId }: { botId: string }) {
       await updateStep(nextIndex);
     }
 
-    if (status === "skipped" || status === "finished" || status === "error" || type === "error:target_not_found") {
+    if (
+      status === "skipped" ||
+      status === "finished" ||
+      status === "error" ||
+      type === "error:target_not_found" ||
+      (isLastStep && type === "step:after" && action === "next") ||
+      type === "tour:end"
+    ) {
       await completeOnboarding();
     }
   }, [updateStep, completeOnboarding]);
