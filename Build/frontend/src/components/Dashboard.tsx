@@ -22,14 +22,22 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
   const reducedMotion = useReducedMotion();
 
   const handleJoyrideCallback = useCallback(async (data: any) => {
-    const { action, index, status, type } = data;
+    const { action, index, status, type, size } = data;
+    const isLastStep = index === size - 1;
 
-    if (type === "step:after" && (action === "next" || action === "prev")) {
+    if (type === "step:after" && !isLastStep && (action === "next" || action === "prev")) {
       const nextIndex = action === "next" ? index + 1 : index - 1;
       await updateStep(nextIndex);
     }
 
-    if (status === "skipped" || status === "finished" || status === "error" || type === "error:target_not_found") {
+    if (
+      status === "skipped" ||
+      status === "finished" ||
+      status === "error" ||
+      type === "error:target_not_found" ||
+      (isLastStep && type === "step:after" && action === "next") ||
+      type === "tour:end"
+    ) {
       await completeOnboarding();
     }
   }, [updateStep, completeOnboarding]);
