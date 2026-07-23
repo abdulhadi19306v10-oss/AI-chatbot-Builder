@@ -5,27 +5,12 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const pool = require('./db');
 
-const dbUrl = process.env.DATABASE_URL || '';
 const optIn = process.env.I_AM_SURE_I_WANT_TO_RUN_THIS_TEST === 'true';
 
-let isTestDb = false;
-try {
-  const parsed = new URL(dbUrl);
-  const hostname = parsed.hostname;
-  const dbname = parsed.pathname ? parsed.pathname.replace(/^\//, '').split('?')[0] : '';
-  
-  const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
-  const isTestDbName = dbname === 'test' || dbname.startsWith('test_') || dbname.endsWith('_test');
-  
-  isTestDb = isLocalHost || isTestDbName;
-} catch (err) {
-  isTestDb = false;
-}
-
-if (!isTestDb && !optIn) {
-  console.error('❌ Error: Do not run this script against a production database.');
-  console.error('This script modifies user passwords and inserts test reset tokens.');
-  console.error('To run this test, use a local database (localhost/127.0.0.1), a database name ending/starting with "test", or set I_AM_SURE_I_WANT_TO_RUN_THIS_TEST=true.');
+if (!optIn) {
+  console.error('❌ Error: Enforcing strict safety checks.');
+  console.error('This script modifies user passwords and deletes test user credentials.');
+  console.error('To run this test, you must explicitly set I_AM_SURE_I_WANT_TO_RUN_THIS_TEST=true.');
   process.exit(1);
 }
 
@@ -69,31 +54,23 @@ async function runTest() {
       console.log('✅ Success: Token is not exposed in the API response body.');
     }
 
-    // 3. Query the DB directly to get the token hash to simulate receiving the email link
-    const resetRes = await pool.query(
-      'SELECT * FROM password_resets WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
-      [testUserId]
-    );
-    if (resetRes.rows.length === 0) {
-      console.error('❌ Error: No password reset token hash was created in the database!');
+    // 3. Retrieve the actual raw token issued by forgot-password from backend test hook
+    console.log('Fetching raw token from test hook...');
+    const tokenHookRes = await fetch('http://localhost:8000/auth/test-last-token');
+    if (!tokenHookRes.ok) {
+      console.error('❌ Error: Fetching test hook failed. Make sure server is running with APP_ENV=test!');
       testFailed = true;
       return;
     }
-    const tokenHash = resetRes.rows[0].token_hash;
-    console.log(`Found reset token hash in DB: ${tokenHash}`);
-
-    // Wait! Since the console logged the link with the raw token, let's retrieve the raw token.
-    // In our test script, we don't have the raw token from console log capture directly.
-    // Let's create a raw token manually for testing /auth/reset-password endpoint directly!
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const customHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+    const tokenHookData = await tokenHookRes.json();
+    const rawToken = tokenHookData.token;
     
-    // Insert custom reset token into DB
-    await pool.query(
-      "INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES ($1, $2, NOW() + INTERVAL '1 hour')",
-      [testUserId, customHash]
-    );
-    console.log(`Generated custom raw test token: ${rawToken}`);
+    if (!rawToken) {
+      console.error('❌ Error: Test hook did not return a token. Didforgot-password run successfully?');
+      testFailed = true;
+      return;
+    }
+    console.log(`✅ Success: Retrieved raw token issued by forgot-password: ${rawToken}`);
 
     // 3.5. Confirm a short password is server-side rejected
     console.log('Calling POST /auth/reset-password with a short password...');
@@ -185,7 +162,7 @@ async function runTest() {
     // Cleanup test user
     if (testUserId) {
       try {
-        await pool.query('DELETE FROM users WHERE id = $1', [testUserId]);
+        await pool.query('DELETE FROM users WHERE email = $1', [testEmail]); // cleanup by email
         console.log('Cleanup complete.');
       } catch (cleanupErr) {
         testFailed = true;

@@ -130,6 +130,8 @@ const forgotPasswordLimiter = rateLimit({
 });
 
 // POST /auth/forgot-password
+let lastTestToken = null;
+
 router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
   const { email } = req.body;
   const genericResponse = { message: "If that email is registered, a reset link has been sent." };
@@ -149,8 +151,17 @@ router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
         [user.id, tokenHash]
       );
 
+      // Store in test hook if test environment
+      if (process.env.APP_ENV === 'test') {
+        lastTestToken = token;
+      }
+
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-      console.log(`[auth] Reset link: ${frontendUrl}/reset-password?token=${token}`);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[auth] Reset link: ${frontendUrl}/reset-password?token=${token}`);
+      } else {
+        console.log(`[auth] Reset link generated for user: ${email.trim().toLowerCase()} (token redacted in production)`);
+      }
     }
 
     res.json(genericResponse);
@@ -177,18 +188,7 @@ router.post('/reset-password', async (req, res) => {
   try {
     const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
     
-    // Look up valid active reset token
-    const { rows } = await pool.query(
-      'SELECT id, user_id FROM password_resets WHERE token_hash = $1 AND used = false AND expires_at > NOW()',
-      [tokenHash]
-    );
-    const reset = rows[0];
-
-    if (!reset) {
-      return res.status(400).json({ error: genericError });
-    }
-
-    // Hash the new password
+    // Hash the new password before checking connection out of pool (save CPU work on connected client)
     const hash = await bcrypt.hash(new_password, SALT_ROUNDS);
 
     // Update user's password and invalidate all outstanding tokens for this user in a transaction
@@ -196,6 +196,21 @@ router.post('/reset-password', async (req, res) => {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
+      
+      // Claim the token atomically inside the transaction to prevent replay race conditions
+      const { rows } = await client.query(
+        `UPDATE password_resets SET used = true
+         WHERE token_hash = $1 AND used = false AND expires_at > NOW()
+         RETURNING id, user_id`,
+        [tokenHash]
+      );
+      const reset = rows[0];
+
+      if (!reset) {
+        await client.query('ROLLBACK');
+        return res.status(400).json({ error: genericError });
+      }
+
       await client.query('UPDATE users SET password_hash = $1 WHERE id = $2', [hash, reset.user_id]);
       await client.query('UPDATE password_resets SET used = true WHERE user_id = $1 AND used = false', [reset.user_id]);
       await client.query('COMMIT');
@@ -212,5 +227,12 @@ router.post('/reset-password', async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
+// Test endpoint to fetch the last generated test token in test environment
+if (process.env.APP_ENV === 'test') {
+  router.get('/test-last-token', (req, res) => {
+    res.json({ token: lastTestToken });
+  });
+}
 
 module.exports = { router, requireAuth };

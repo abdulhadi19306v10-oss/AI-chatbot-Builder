@@ -86,10 +86,11 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleSubmit} className="space-y-5 mb-6">
               {/* Email */}
               <div>
-                <label className="block text-[11px] font-semibold uppercase tracking-wider text-secondary mb-1.5">
+                <label htmlFor="email" className="block text-[11px] font-semibold uppercase tracking-wider text-secondary mb-1.5">
                   Email Address
                 </label>
                 <input
+                  id="email"
                   type="email"
                   required
                   value={email}
