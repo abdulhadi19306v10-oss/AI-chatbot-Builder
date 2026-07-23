@@ -118,7 +118,7 @@ router.post('/:bot_token/message', async (req, res) => {
 
 // POST /chat/:bot_token/leads — lead capture from widget after fallback
 router.post('/:bot_token/leads', async (req, res) => {
-  const { session_id, name, email } = req.body;
+  const { session_id, name, email, message } = req.body;
   if (!session_id || !name || !email) return res.status(400).json({ error: 'session_id, name, email required' });
 
   const { rows: botRows } = await pool.query('SELECT id FROM bots WHERE bot_token=$1', [req.params.bot_token]);
@@ -132,8 +132,8 @@ router.post('/:bot_token/leads', async (req, res) => {
   const conv = convRows[0] || null;
 
   await pool.query(
-    'INSERT INTO leads (bot_id, email, name, conversation_id) VALUES ($1,$2,$3,$4)',
-    [bot.id, email, name, conv?.id || null]
+    'INSERT INTO leads (bot_id, email, name, conversation_id, message) VALUES ($1,$2,$3,$4,$5)',
+    [bot.id, email, name, conv?.id || null, message || null]
   );
 
   res.json({ status: 'captured' });

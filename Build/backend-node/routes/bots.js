@@ -119,7 +119,7 @@ router.delete('/:id/documents/:doc_id', requireAuth, ownBot, async (req, res) =>
 
 // GET /bots/:id/leads - ponytail: standard simple fetch
 router.get('/:id/leads', requireAuth, ownBot, async (req, res) => {
-  const { rows } = await pool.query('SELECT name, email, created_at FROM leads WHERE bot_id=$1 ORDER BY created_at DESC', [req.bot.id]);
+  const { rows } = await pool.query('SELECT name, email, message, created_at FROM leads WHERE bot_id=$1 ORDER BY created_at DESC', [req.bot.id]);
   res.json(rows);
 });
 

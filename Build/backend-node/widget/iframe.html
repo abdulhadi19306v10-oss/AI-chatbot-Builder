@@ -60,6 +60,7 @@
     let themeColor = '#6366f1';
     let welcomeMsg = 'Hi! How can I help you today?';
     let avatarIcon = '🤖';
+    let lastUserMessage = '';
 
     const toggleBtn = document.getElementById('toggle');
     const chatBox = document.getElementById('chat-box');
@@ -137,6 +138,7 @@
     async function sendMessage() {
       const text = input.value.trim();
       if (!text) return;
+      lastUserMessage = text;
       input.value = '';
       appendMsg('user', text);
       input.disabled = true;
@@ -178,14 +180,20 @@
         <div style="font-size:12px;color:#64748b">Please provide your details so we can get back to you:</div>
         <input type="text" id="lf-name" placeholder="Name" required />
         <input type="email" id="lf-email" placeholder="Email" required />
+        <input type="text" id="lf-message" placeholder="Your question/message" required />
         <button id="lf-submit">Submit</button>
       `;
       messages.appendChild(form);
+
+      // Pre-fill last question
+      document.getElementById('lf-message').value = lastUserMessage;
+
       messages.scrollTop = messages.scrollHeight;
 
       document.getElementById('lf-submit').addEventListener('click', async () => {
         const name = document.getElementById('lf-name').value.trim();
         const email = document.getElementById('lf-email').value.trim();
+        const message = document.getElementById('lf-message').value.trim();
         if (!name || !email) return alert('Name and email required');
         
         const btn = document.getElementById('lf-submit');
@@ -196,7 +204,7 @@
           const res = await fetch('/chat/' + botToken + '/leads', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ session_id: sessionId, name, email })
+            body: JSON.stringify({ session_id: sessionId, name, email, message })
           });
           if(res.ok) {
             form.innerHTML = '<div style="font-size:14px;color:#10b981;font-weight:bold;">Thanks! We will be in touch.</div>';

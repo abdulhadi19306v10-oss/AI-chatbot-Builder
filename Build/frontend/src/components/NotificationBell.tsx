@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 type Lead = {
   name: string;
   email: string;
+  message?: string;
   created_at: string;
   bot_name: string;
 };
@@ -170,6 +171,11 @@ export default function NotificationBell() {
                         )}
                       </div>
                       <p className="text-xs text-secondary truncate">{lead.email}</p>
+                      {lead.message && (
+                        <p className="text-xs text-ink bg-paper/40 rounded px-2 py-1.5 mt-1 border border-border/40 whitespace-pre-wrap break-words max-h-24 overflow-y-auto">
+                          {lead.message}
+                        </p>
+                      )}
                       <div className="flex items-center gap-1.5 mt-1">
                         <span className="text-[10px] bg-card text-ink px-1.5 py-0.5 rounded-full font-medium truncate max-w-[120px]">
                           {lead.bot_name}

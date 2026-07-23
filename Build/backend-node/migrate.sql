@@ -85,7 +85,8 @@ CREATE TABLE IF NOT EXISTS leads (
   bot_id          UUID NOT NULL REFERENCES bots(id) ON DELETE CASCADE,
   email           TEXT NOT NULL,
   name            TEXT NOT NULL,
-  conversation_id UUID REFERENCES conversations(id),
+  conversation_id UUID REFERENCES conversations(id) ON DELETE SET NULL,
+  message         TEXT,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -104,3 +105,10 @@ CREATE INDEX IF NOT EXISTS idx_chunks_embedding ON chunks USING ivfflat (embeddi
 -- Onboarding migrations for existing users
 ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_completed_at TIMESTAMPTZ NULL;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_step INT DEFAULT 0;
+
+-- ponytail: Ensure existing leads table gets the message column and updated constraint
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS message TEXT;
+ALTER TABLE leads DROP CONSTRAINT IF EXISTS leads_conversation_id_fkey;
+ALTER TABLE leads ADD CONSTRAINT leads_conversation_id_fkey
+  FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE SET NULL;
+

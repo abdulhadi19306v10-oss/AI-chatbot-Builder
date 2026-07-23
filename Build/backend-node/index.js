@@ -35,5 +35,8 @@ app.use('/chat', chatLimiter, chatRouter);
 
 app.get('/health', (_, res) => res.json({ status: 'ok' }));
 
+const { startGC } = require('./gc');
+startGC();
+
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Backend running on http://localhost:${PORT}`));
