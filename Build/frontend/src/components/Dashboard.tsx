@@ -68,9 +68,9 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
 
   useEffect(() => {
     async function loadBots() {
-      const token = await getToken();
-      if (!token || token === "test") return;
       try {
+        const token = await getToken();
+        if (!token || token === "test") return;
         const res = await fetch(`${getBackendUrl()}/bots`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -174,10 +174,10 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
 
   return (
     <div className="space-y-8 relative">
-      {mounted && runTour && currentStep < 2 && initialLoadDone && bots.length === 0 && !showModal && (
+      {mounted && (
         <JoyrideComponent
           steps={steps as any[]}
-          run={true}
+          run={runTour && currentStep < 2 && initialLoadDone && bots.length === 0}
           stepIndex={currentStep}
           onEvent={handleJoyrideCallback}
           continuous={true}
@@ -328,7 +328,7 @@ export default function Dashboard({ onBotsChange }: { onBotsChange?: (bots: { id
 
       {/* ── Create Bot Modal ─────────────────────────────── */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[10005] flex items-center justify-center p-4">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/30"
