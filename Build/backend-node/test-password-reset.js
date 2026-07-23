@@ -5,12 +5,28 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const pool = require('./db');
 
+const dbUrl = process.env.DATABASE_URL || '';
 const optIn = process.env.I_AM_SURE_I_WANT_TO_RUN_THIS_TEST === 'true';
+const isTestEnv = process.env.APP_ENV === 'test';
 
-if (!optIn) {
+let isTestDb = false;
+try {
+  const parsed = new URL(dbUrl);
+  const hostname = parsed.hostname;
+  const dbname = parsed.pathname ? parsed.pathname.replace(/^\//, '').split('?')[0] : '';
+  
+  const isLocalHost = hostname === 'localhost' || hostname === '127.0.0.1';
+  const isTestDbName = dbname === 'test' || dbname.startsWith('test_') || dbname.endsWith('_test');
+  
+  isTestDb = isLocalHost || isTestDbName;
+} catch (err) {
+  isTestDb = false;
+}
+
+if (!isTestDb || !optIn || !isTestEnv) {
   console.error('❌ Error: Enforcing strict safety checks.');
   console.error('This script modifies user passwords and deletes test user credentials.');
-  console.error('To run this test, you must explicitly set I_AM_SURE_I_WANT_TO_RUN_THIS_TEST=true.');
+  console.error('To run this test, you must be in a test environment (APP_ENV=test), use a test database (localhost or named test_*/*_test), AND set I_AM_SURE_I_WANT_TO_RUN_THIS_TEST=true.');
   process.exit(1);
 }
 
@@ -43,6 +59,12 @@ async function runTest() {
       body: JSON.stringify({ email: testEmail })
     });
     
+    if (!forgotRes.ok) {
+      console.error(`❌ Error: forgot-password endpoint returned status ${forgotRes.status}`);
+      testFailed = true;
+      return;
+    }
+
     const forgotData = await forgotRes.json();
     console.log('Response body:', forgotData);
     
@@ -56,7 +78,7 @@ async function runTest() {
 
     // 3. Retrieve the actual raw token issued by forgot-password from backend test hook
     console.log('Fetching raw token from test hook...');
-    const tokenHookRes = await fetch('http://localhost:8000/auth/test-last-token');
+    const tokenHookRes = await fetch(`http://localhost:8000/auth/test-last-token?email=${encodeURIComponent(testEmail)}`);
     if (!tokenHookRes.ok) {
       console.error('❌ Error: Fetching test hook failed. Make sure server is running with APP_ENV=test!');
       testFailed = true;
@@ -66,11 +88,11 @@ async function runTest() {
     const rawToken = tokenHookData.token;
     
     if (!rawToken) {
-      console.error('❌ Error: Test hook did not return a token. Didforgot-password run successfully?');
+      console.error('❌ Error: Test hook did not return a token. Did forgot-password run successfully?');
       testFailed = true;
       return;
     }
-    console.log(`✅ Success: Retrieved raw token issued by forgot-password: ${rawToken}`);
+    console.log('✅ Success: Retrieved raw token issued by forgot-password.');
 
     // 3.5. Confirm a short password is server-side rejected
     console.log('Calling POST /auth/reset-password with a short password...');

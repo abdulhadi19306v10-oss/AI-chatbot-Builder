@@ -130,7 +130,8 @@ const forgotPasswordLimiter = rateLimit({
 });
 
 // POST /auth/forgot-password
-let lastTestToken = null;
+// ponytail: memory map to store test tokens scoped to emails to prevent cross-test race conditions
+const testTokens = {};
 
 router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
   const { email } = req.body;
@@ -153,7 +154,7 @@ router.post('/forgot-password', forgotPasswordLimiter, async (req, res) => {
 
       // Store in test hook if test environment
       if (process.env.APP_ENV === 'test') {
-        lastTestToken = token;
+        testTokens[email.trim().toLowerCase()] = token;
       }
 
       const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -231,7 +232,8 @@ router.post('/reset-password', async (req, res) => {
 // Test endpoint to fetch the last generated test token in test environment
 if (process.env.APP_ENV === 'test') {
   router.get('/test-last-token', (req, res) => {
-    res.json({ token: lastTestToken });
+    const email = (req.query.email || '').trim().toLowerCase();
+    res.json({ token: testTokens[email] || null });
   });
 }
 
