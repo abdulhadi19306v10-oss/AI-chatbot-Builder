@@ -164,15 +164,18 @@ cd Build/backend-node
 
 # 1. Password Reset Integration Tests
 # Requires setting database connection, APP_ENV=test, and the explicit override opt-in
-$env:DATABASE_URL="postgresql://neondb_owner:npg_7jRxChIm8WBL@ep-twilight-surf-azli3hmh.c-3.ap-southeast-1.aws.neon.tech/neondb_test?sslmode=require"
+# Make sure the backend server process is started using the identical DATABASE_URL connection!
+$env:DATABASE_URL="<test-database-connection-string>"
 $env:I_AM_SURE_I_WANT_TO_RUN_THIS_TEST="true"
 $env:APP_ENV="test"
+$env:CHAT_API_BASE_URL="http://localhost:8000"
 node test-password-reset.js
 
 # 2. Multilingual RAG & Localized Fallback Tests
 # Runs Spanish matching queries, cross-lingual context generation, and localized fallbacks
-$env:DATABASE_URL="postgresql://neondb_owner:npg_7jRxChIm8WBL@ep-twilight-surf-azli3hmh.c-3.ap-southeast-1.aws.neon.tech/neondb_test?sslmode=require"
+$env:DATABASE_URL="<test-database-connection-string>"
 $env:I_AM_SURE_I_WANT_TO_RUN_THIS_TEST="true"
 $env:APP_ENV="test"
+$env:CHAT_API_BASE_URL="http://localhost:8000"
 node test-multilingual.js
 ```

@@ -8,6 +8,7 @@ const pool = require('./db');
 const dbUrl = process.env.DATABASE_URL || '';
 const optIn = process.env.I_AM_SURE_I_WANT_TO_RUN_THIS_TEST === 'true';
 const isTestEnv = process.env.APP_ENV === 'test';
+const apiBaseUrl = process.env.CHAT_API_BASE_URL || 'http://localhost:8000';
 
 let isTestDb = false;
 try {
@@ -29,11 +30,12 @@ if (!isTestDb || !optIn || !isTestEnv) {
   console.error('❌ Error: Enforcing strict safety checks.');
   console.error('This script modifies user passwords and deletes test user credentials.');
   console.error('To run this test, you must be in a test environment (APP_ENV=test), use a test database (localhost or named test_*/*_test), AND set I_AM_SURE_I_WANT_TO_RUN_THIS_TEST=true.');
+  console.error('Ensure that the backend process is started using the identical DATABASE_URL.');
   process.exit(1);
 }
 
 async function runTest() {
-  console.log('Starting password reset verification test...');
+  console.log(`Starting password reset verification test against backend: ${apiBaseUrl}...`);
   let testFailed = false;
   let testUserId = null;
   const testEmail = 'reset-test@example.com';
@@ -55,7 +57,7 @@ async function runTest() {
 
     // 2. Request forgot password using local fetch
     console.log('Calling POST /auth/forgot-password...');
-    const forgotRes = await fetch('http://localhost:8000/auth/forgot-password', {
+    const forgotRes = await fetch(`${apiBaseUrl}/auth/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: testEmail })
@@ -80,7 +82,7 @@ async function runTest() {
 
     // 3. Retrieve the actual raw token issued by forgot-password from backend test hook
     console.log('Fetching raw token from test hook...');
-    const tokenHookRes = await fetch(`http://localhost:8000/auth/test-last-token?email=${encodeURIComponent(testEmail)}`);
+    const tokenHookRes = await fetch(`${apiBaseUrl}/auth/test-last-token?email=${encodeURIComponent(testEmail)}`);
     if (!tokenHookRes.ok) {
       console.error('❌ Error: Fetching test hook failed. Make sure server is running with APP_ENV=test!');
       testFailed = true;
@@ -98,7 +100,7 @@ async function runTest() {
 
     // 3.5. Confirm a short password is server-side rejected
     console.log('Calling POST /auth/reset-password with a short password...');
-    const shortPasswordRes = await fetch('http://localhost:8000/auth/reset-password', {
+    const shortPasswordRes = await fetch(`${apiBaseUrl}/auth/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: rawToken, new_password: 'short' })
@@ -114,7 +116,7 @@ async function runTest() {
 
     // 4. Use the custom raw token to reset the password
     console.log('Calling POST /auth/reset-password...');
-    const resetRes2 = await fetch('http://localhost:8000/auth/reset-password', {
+    const resetRes2 = await fetch(`${apiBaseUrl}/auth/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: rawToken, new_password: newPassword })
@@ -141,7 +143,7 @@ async function runTest() {
 
     // 6. Confirm the same token can't be used a second time
     console.log('Attempting to use the same token a second time...');
-    const reuseRes = await fetch('http://localhost:8000/auth/reset-password', {
+    const reuseRes = await fetch(`${apiBaseUrl}/auth/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: rawToken, new_password: 'another_password789' })
@@ -165,7 +167,7 @@ async function runTest() {
     );
     
     console.log('Attempting to use an expired token...');
-    const expiredRes = await fetch('http://localhost:8000/auth/reset-password', {
+    const expiredRes = await fetch(`${apiBaseUrl}/auth/reset-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token: expiredToken, new_password: 'expired_password789' })
