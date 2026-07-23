@@ -62,6 +62,20 @@ graph TD
 * **Micro-Animations**: Animated state toggles and transitions powered by `gsap` (GreenSock) and `animejs`.
 * **Interactive Onboarding Tour**: Integrated onboarding guide powered by `react-joyride` to seamlessly walk new users through the setup.
 
+### 6. Automated Garbage Collection
+* **Stuck Reaper Pruning:** Hourly job to identify and clean up stuck database training processes or ingestions.
+* **Retention Cleanup:** Daily job that prunes conversations older than a configured number of days (safeguarded against negative numbers and invalid integers via environment configuration `CONVERSATION_RETENTION_DAYS`).
+
+### 7. Secure Password Reset Flow
+* **Token Hashing:** Uses `crypto` SHA-256 to hash reset tokens before storing them in the database to prevent database leakage exploits.
+* **Atomic Transaction Safety:** Checks out a dedicated database connection client to run the reset updates atomically, claiming the token in the first query to avoid concurrent double-use replays.
+* **Double Validation:** Strict minimum 8-character password length checks enforced both client-side and server-side.
+* **API Rate Limiting:** Endpoint rate limiting (max 5 requests/hour per IP) to prevent spam.
+
+### 8. Multilingual RAG & Fallbacks
+* **Cross-Language Query Matching:** The RAG system instructs Gemini to answer in the visitor's query language, even if the database knowledge context is written in English or another language.
+* **Dynamic Localized Fallbacks:** On match failure (zero chunks or LLM `NO_MATCH`), the bot generates a dynamic, context-aware fallback message in the user's language using Gemini, prompting for contact details.
+
 ---
 
 ## 🛠️ Technology Stack
@@ -138,3 +152,27 @@ cd ../..
 python run.py
 ```
 This boots the database container, spins up the Node API backend on `http://localhost:8000`, and starts the Next.js admin dashboard on `http://localhost:3000`.
+
+---
+
+## 🧪 Automated Testing
+
+Run the backend validation test suites to verify system functionality and safety guards:
+
+```bash
+cd Build/backend-node
+
+# 1. Password Reset Integration Tests
+# Requires setting database connection, APP_ENV=test, and the explicit override opt-in
+$env:DATABASE_URL="postgresql://neondb_owner:npg_7jRxChIm8WBL@ep-twilight-surf-azli3hmh.c-3.ap-southeast-1.aws.neon.tech/neondb_test?sslmode=require"
+$env:I_AM_SURE_I_WANT_TO_RUN_THIS_TEST="true"
+$env:APP_ENV="test"
+node test-password-reset.js
+
+# 2. Multilingual RAG & Localized Fallback Tests
+# Runs Spanish matching queries, cross-lingual context generation, and localized fallbacks
+$env:DATABASE_URL="postgresql://neondb_owner:npg_7jRxChIm8WBL@ep-twilight-surf-azli3hmh.c-3.ap-southeast-1.aws.neon.tech/neondb_test?sslmode=require"
+$env:I_AM_SURE_I_WANT_TO_RUN_THIS_TEST="true"
+$env:APP_ENV="test"
+node test-multilingual.js
+```
